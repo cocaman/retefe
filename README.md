@@ -8,3 +8,5 @@ Artefacts from various retefe campaigns
   * https://github.com/quasar/QuasarRAT/blob/master/Client/Core/Recovery/Browsers/Firefox.cs
 2. Pastebin: Firefox 37+ Password & Cookie Recovery
   * http://pastebin.com/Qzctxjet
+3. PowerShell Code Repository: Using Task Sch, wrapper by BattleChicken
+  * http://poshcode.org/5805
