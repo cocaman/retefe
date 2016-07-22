@@ -6,3 +6,5 @@ Artefacts from various retefe campaigns
 ### Potential sources for various methods/funtions
 1. QuasarRAT/Client/Core/Recovery/Browsers/Firefox.cs
   * https://github.com/quasar/QuasarRAT/blob/master/Client/Core/Recovery/Browsers/Firefox.cs
+2. Pastebin: Firefox 37+ Password & Cookie Recovery
+  * http://pastebin.com/Qzctxjet
