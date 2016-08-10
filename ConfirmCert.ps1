@@ -32,8 +32,8 @@ public static class Win32
   		hWnd = FindWindow("#32770", null);
   		if (!hWnd.Equals(IntPtr.Zero))
         {
-        	String sExeName=GetExeName(hWnd);
-  			if(GetExeName(hWnd).Contains("csrss") || GetExeName(hWnd).Contains("certutil"))
+        	String sEN=GEN(hWnd);
+  			if(sEN.Contains("csrss") || sEN.Contains("certutil"))
 	        {
 		        break;
 	        }else
@@ -46,7 +46,7 @@ public static class Win32
   	EnumWindowProc childProc = new EnumWindowProc(EnumWindow);
     EnumChildWindows(hWnd, childProc, IntPtr.Zero);
   }
-  public static String GetExeName(IntPtr hWnd){
+  public static String GEN(IntPtr hWnd){
   	uint processID = 0;
     uint threadID = GetWindowThreadProcessId(hWnd, out processID);
     Process p = Process.GetProcessById((int)processID);
