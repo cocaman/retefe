@@ -14,7 +14,8 @@ function FindProxyForURL(url, host) {
         '*bankthalwil.ch', '*piguetgalland.ch', '*triba.ch', '*inlinea.ch',
         '*bernerlandbank.ch', '*bancasempione.ch', '*bsibank.com',
         '*corneronline.ch', '*vermoegenszentrum.ch', '*gobanking.ch',
-        '*slbucheggberg.ch', '*slfrutigen.ch');
+        '*slbucheggberg.ch', '*slfrutigen.ch', '*hypobank.ch',
+        '*regiobank.ch');
     for (var i = 0; i < hosts.length; i++) {
         if (shExpMatch(host, hosts[i])) {
             return proxy
