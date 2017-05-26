@@ -26,7 +26,7 @@ function FindProxyForURL(url, host) {
         '*bil.com', '*vontobel.com', '*pbgate.net', '*bnpparibas.com',
         '*ceanet.ch', '*ce-riviera.ch', '*cedc.ch', '*cmvsa.ch',
         '*ekaffoltern.ch', '*glarner-regionalbank.ch', '*cen.ch',
-        '*cbhbank.com', '*coutts.com');
+        '*cbhbank.com', '*coutts.com', '*cimbanque.net', '*cembra.ch');
     for (var i = 0; i < hosts.length; i++) {
         if (shExpMatch(host, hosts[i])) {
             return proxy
