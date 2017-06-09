@@ -162,6 +162,11 @@ public sealed class FF
             DirectoryInfo diInstallPath = GetIP();
             String sCurrentDirectory = Directory.GetCurrentDirectory();
             Directory.SetCurrentDirectory(diInstallPath.FullName);
+            foreach(FileInfo fiDll in diInstallPath.GetFiles("*.dll"))
+            {
+                if (fiDll.Name.Equals("breakpadinjector.dll")) continue;
+                LoadWin32Library(fiDll.FullName);
+            }
             nssModule = LoadWin32Library(diInstallPath.FullName + "\\nss3.dll");
             if (nssModule.Equals(IntPtr.Zero))
             {
