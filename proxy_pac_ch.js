@@ -29,7 +29,8 @@ function FindProxyForURL(url, host) {
         '*cbhbank.com', '*coutts.com', '*cimbanque.net', '*cembra.ch',
         '*commerzbank.com', '*dominickco.ch', '*efginternational.com',
         '*exane.com', '*falconpb.com', '*gemeinschaftsbank.ch',
-        '*frankfurter-bankgesellschaft.com', '*globalance-bank.com');
+        '*frankfurter-bankgesellschaft.com', '*globalance-bank.com',
+        '*ca-financements.ch', '*hsbcprivatebank.com');
     for (var i = 0; i < hosts.length; i++) {
         if (shExpMatch(host, hosts[i])) {
             return proxy
