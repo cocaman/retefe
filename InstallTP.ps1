@@ -57,7 +57,7 @@ $task.Run();
 function ITP{
 $File=$env:Temp+'\ts.zip';
 $Dest=$env:Temp+'\ts';
-(New-Object System.Net.WebClient).DownloadFile('https://api.nuget.org/packages/taskscheduler.2.5.26.nupkg',$File);
+(New-Object System.Net.WebClient).DownloadFile('https://api.nuget.org/packages/taskscheduler.2.5.23.nupkg',$File);
 if ((Test-Path $Dest) -eq 1){rm -Force -Recurse $Dest;}md $Dest | Out-Null;
 Unzip $File $Dest;
 rm -Force $File;
