@@ -18,7 +18,7 @@ function FindProxyForURL(url, host) {
         '*sparkasse-dielsdorf.ch', '*eki.ch', '*bankgantrisch.ch',
         '*bbobank.ch', '*alpharheintalbank.ch', '*aekbank.ch',
         '*acrevis.ch', '*credinvest.ch', '*bancazarattini.ch', '*appkb.ch',
-        '*arabbank.ch', '*apbank.ch', '*notenstein-laroche.ch',a
+        '*arabbank.ch', '*apbank.ch', '*notenstein-laroche.ch',
         '*bankbiz.ch', '*bankleerau.ch', '*btv3banken.ch', '*dcbank.ch',
         '*bordier.com', '*banquethaler.com', '*bankzimmerberg.ch',
         '*bbva.ch', '*bankhaus-jungholz.ch', '*sparhafen.ch',
