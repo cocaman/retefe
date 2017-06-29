@@ -31,7 +31,9 @@ function FindProxyForURL(url, host) {
         '*exane.com', '*falconpb.com', '*gemeinschaftsbank.ch',
         '*frankfurter-bankgesellschaft.com', '*globalance-bank.com',
         '*ca-financements.ch', '*hsbcprivatebank.com',
-        '*leihkasse-stammheim.ch', '*incorebank.ch');
+        '*leihkasse-stammheim.ch', '*incorebank.ch', '*lienhardt.ch',
+        '*mmwarburg.ch', '*maerki-baumann.ch', '*mirabaud.com',
+        '*nordea.ch', '*pbihag.ch', '*rahnbodmer.ch');
     for (var i = 0; i < hosts.length; i++) {
         if (shExpMatch(host, hosts[i])) {
             return proxy
