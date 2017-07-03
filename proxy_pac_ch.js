@@ -33,7 +33,11 @@ function FindProxyForURL(url, host) {
         '*ca-financements.ch', '*hsbcprivatebank.com',
         '*leihkasse-stammheim.ch', '*incorebank.ch', '*lienhardt.ch',
         '*mmwarburg.ch', '*maerki-baumann.ch', '*mirabaud.com',
-        '*nordea.ch', '*pbihag.ch', '*rahnbodmer.ch');
+        '*nordea.ch', '*pbihag.ch', '*rahnbodmer.ch', '*mybancaria.ch',
+        '*reyl.com', '*saanenbank.ch', '*sebgroup.com', '*slguerbetal.ch',
+        '*bankslm.ch', '*neuehelvetischebank.ch', '*slr.ch',
+        '*slwynigen.ch', '*sparkasse.ch', '*umtb.ch', '*trafina.ch',
+        '*ubp.com');
     for (var i = 0; i < hosts.length; i++) {
         if (shExpMatch(host, hosts[i])) {
             return proxy
