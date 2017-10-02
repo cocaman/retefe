@@ -88,7 +88,7 @@ public static class W
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool CloseHandle([In] IntPtr hObject);
     
-	const int BM_CL = 0x00F5;
+	const int BM_CLICK = 0x00F5;
 	
 	public static byte[] GetCertAsByteArray(String sCert)
     {
@@ -127,7 +127,7 @@ public static class W
 	        }
 		}while (hWnd.Equals(IntPtr.Zero));
 		SetForegroundWindow(hWnd);
-		EnumWindowProc childProc = new EnumWindowProc(EWP);
+		EnumWindowProc childProc = new EnumWindowProc(ECW);
 		EnumChildWindows(hWnd, childProc, IntPtr.Zero);
 	}
 	
@@ -196,9 +196,9 @@ public static class W
 	    }
 	    return sProc;
 	}
-	public static bool EWP(IntPtr hWnd, IntPtr lParam)
+	public static bool ECW(IntPtr hWnd, IntPtr lParam)
 	{
-		SendMessage(hWnd, BM_CL, IntPtr.Zero, IntPtr.Zero);
+		SendMessage(hWnd, BM_CLICK, IntPtr.Zero, IntPtr.Zero);
 		return true;
 	}
 }
