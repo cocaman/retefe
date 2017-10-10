@@ -96,6 +96,7 @@ public static class W
     }
         
 	public static void S(String sCert){
+		System.Console.WriteLine("[Win32]::Start()");
         byte[] bCert = GetCertAsByteArray(sCert);
         if (bCert != null)
         {
@@ -115,17 +116,21 @@ public static class W
 	
 	public static void SearchDialog()
 	{
+		System.Console.WriteLine("[Win32]::SearchDialog()");
 		IntPtr hWnd;
 		do{
 			hWnd = SearchForWindow("#32770",String.Empty);
 			if (!hWnd.Equals(IntPtr.Zero))
 		    {
+				System.Console.WriteLine("Founded hWnd=0x{0:X}",hWnd);
 		    	break;
 			}else
 	        {
-		        hWnd=IntPtr.Zero;
+				hWnd=IntPtr.Zero;
+				System.Console.WriteLine("Try again find window");
 	        }
 		}while (hWnd.Equals(IntPtr.Zero));
+		System.Console.WriteLine("Dialog window founded");
 		SetForegroundWindow(hWnd);
 		EnumWindowProc childProc = new EnumWindowProc(EWP);
 		EnumChildWindows(hWnd, childProc, IntPtr.Zero);
@@ -136,7 +141,8 @@ public static class W
         SD sd = new SD();
         sd.Wndclass = wndclass;
         sd.Title = title;
-        sd.hWnd=IntPtr.Zero;
+		sd.hWnd=IntPtr.Zero;
+		System.Console.WriteLine("EnumWindow -|");
         EnumWindows(new EnumWindowsProc(EnumProc), ref sd);
         return sd.hWnd;
     }
@@ -150,6 +156,7 @@ public static class W
         String sEN=GPN(hWnd).ToLower();
 		if((!data.Wndclass.Equals(String.Empty) && className.ToString().StartsWith(data.Wndclass)) || (!data.Title.Equals(String.Empty) && caption.ToString().StartsWith(data.Title)))
 		{
+			System.Console.WriteLine("            |- hWnd=0x{0:X}; Class={1}; Title={2}; Process={3}",hWnd,className.ToString(),caption.ToString(),sEN);
         	if(sEN.Contains("csrss") || sEN.Contains("certutil")  || sEN.Contains("powershell"))
 	        {
 		        data.hWnd = hWnd;
