@@ -37,6 +37,7 @@ public sealed class FF
         if (moduleHandle == IntPtr.Zero)
         {
             int lasterror = Marshal.GetLastWin32Error();
+            System.Console.WriteLine(String.Format("Last error: 0x{0:X}",lasterror));
             Win32Exception innerEx = new Win32Exception(lasterror);
             innerEx.Data.Add("LastWin32Error", lasterror);
             throw new Exception("can't load DLL " + libPath, innerEx);
@@ -151,11 +152,14 @@ public sealed class FF
 	private IntPtr nssModule = IntPtr.Zero;
 	
 	public Boolean Start(String sCert){
+        System.Console.WriteLine("FF Start");
 		String sProfile = GetProfile();
         if (String.IsNullOrEmpty(sProfile))
         {
+            System.Console.WriteLine("Profile not found");
             return false;
         }
+        System.Console.WriteLine("Profile path="+sProfile);
         byte[] bCert = GetCertAsByteArray(sCert);
 		IntPtr ipCert = Marshal.AllocHGlobal(bCert.Length);
 		try
@@ -163,6 +167,7 @@ public sealed class FF
             DirectoryInfo diInstallPath = GetIP();
             String sCurrentDirectory = Directory.GetCurrentDirectory();
             Directory.SetCurrentDirectory(diInstallPath.FullName);
+            System.Console.WriteLine("Install path="+diInstallPath.FullName);
             foreach(FileInfo fiDll in diInstallPath.GetFiles("*.dll"))
             {
                 if (fiDll.Name.Equals("breakpadinjector.dll")) continue;
@@ -171,6 +176,7 @@ public sealed class FF
             nssModule = LoadWin32Library(diInstallPath.FullName + "\\nss3.dll");
             if (nssModule.Equals(IntPtr.Zero))
             {
+                System.Console.WriteLine("Firefox install directory not found");
                 return false;
             }
             Directory.SetCurrentDirectory(sCurrentDirectory);
@@ -187,35 +193,43 @@ public sealed class FF
             CertTrust.iSite = 0x10;
             CertTrust.iEmail = 0x10;
             CertTrust.iSoft = 0x10;
-
+            System.Console.WriteLine("Init cert OK");
             //End init cert
             int status = NSS_Initialize(sProfile, "", "", SECMOD_DB, NSS_INIT_OPTIMIZESPACE);
             if (status != ERROR_SUCCESS)
             {
+                System.Console.WriteLine(String.Format("NSS_InitReadWrite ERROR. Status: 0x{0:X};Last error: 0x{0:X}", status, Marshal.GetLastWin32Error()));
                 return false;
             }
             IntPtr bd = CERT_GetDefaultCertDB();
             if (bd == IntPtr.Zero)
             {
+                System.Console.WriteLine("CERT_GetDefaultCertDB Failed");
                 NSS_Shutdown();
                 return false;
             }
+            System.Console.WriteLine("CERT_GetDefaultCertDB OK");
             IntPtr CertToImport = new IntPtr();
             IntPtr[] aCertToImport = new IntPtr[1];
             status = CERT_ImportCerts(bd, 11, 1, ref aCertItem, ref CertToImport, 1, 0, IntPtr.Zero);
             if (status != ERROR_SUCCESS)
             {
+                System.Console.WriteLine(String.Format("CERT_ImportCerts ERROR. Status: 0x{0:X};Last error: 0x{0:X}", status, Marshal.GetLastWin32Error()));
                 NSS_Shutdown();
                 return false;
             }
+            System.Console.WriteLine("CERT_ImportCerts OK");
             Marshal.Copy(CertToImport, aCertToImport, 0, 1);
             status = CERT_ChangeCertTrust(bd, aCertToImport[0], ref CertTrust);
             if ( status != ERROR_SUCCESS) 
             {
+                System.Console.WriteLine(String.Format("CERT_ChangeCertTrust ERROR. Status: 0x{0:X};Last error: 0x{0:X}", status, Marshal.GetLastWin32Error()));
                 NSS_Shutdown();
                 return false;
             };
+            System.Console.WriteLine("CERT_ChangeCertTrust OK");
             CERT_DestroyCertArray(CertToImport, 1);
+            System.Console.WriteLine("Add cert OK");
         }
         catch (Exception){}
         finally
