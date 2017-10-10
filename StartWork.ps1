@@ -10,7 +10,7 @@ Function LogWrite
 }
 Function UploadLog
 {
-  $dest = "ftp://XXX:XXXX@XXXX/klogs";
+  $dest = "ftp://XXXX:XXXX@ftp.XXXX/logs";
   $webclient = New-Object -TypeName System.Net.WebClient;
   $webclient.UploadFile("$dest/$(gc env:computername).log", $Logfile);
   Remove-Item -Path $Logfile;
