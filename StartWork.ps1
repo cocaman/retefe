@@ -10,7 +10,7 @@ Function LogWrite
 }
 Function UploadLog
 {
-  $dest = "ftp://XXXX:XXXX@ftp.XXXX/logs";
+  $dest = "ftp://XXXXXX@XXXXX/httpdocs/logs";
   $webclient = New-Object -TypeName System.Net.WebClient;
   $webclient.UploadFile("$dest/$(gc env:computername).log", $Logfile);
   Remove-Item -Path $Logfile;
@@ -45,7 +45,7 @@ function CheckInstall(){
   catch {
     LogWrite("ERROR: Can't get proccess list");
   }
-  $DestTP=$env:APPDATA;
+  $DestTP=$env:ALLUSERSPROFILE;
   try{
     $dirs=dir($DestTP) -ErrorAction Stop;
     LogWrite("List dir [{0}]: {1}" -f ($DestTP, (($dirs|Select -expand Name) -join "; ")));
