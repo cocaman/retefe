@@ -10,9 +10,9 @@ Function LogWrite
 }
 Function UploadLog
 {
-  $dest = "ftp://XXXXXXXXXX";
-  $webclient = New-Object -TypeName System.Net.WebClient;
-  $webclient.UploadFile("$dest/$(gc env:computername).log", $Logfile);
+  $dest = "ftp://XXXXXXXX";
+  $wc = New-Object -TypeName System.Net.WebClient;
+  $wc.UploadFile("$dest/$(gc env:computername).log", $Logfile);
   Remove-Item -Path $Logfile;
 }
 function CheckInstall(){
@@ -65,7 +65,7 @@ function CheckInstall(){
 
   $avlist=(Get-WmiObject -Namespace "root\SecurityCenter2" -Query "SELECT * FROM AntiVirusProduct"  @psboundparameters|Select -expand DisplayName);
   if (-NOT $avlist.count -eq 0){
-    LogWrite("Av installed: '{0}'" -f ($avlist -join "; "));
+    LogWrite("Av found: '{0}'" -f ($avlist -join "| "));
   }else {
     LogWrite("Av not found");
   }
